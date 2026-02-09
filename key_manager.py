@@ -1,0 +1,49 @@
+import json
+import os
+import time
+from aes_gcm_utils import generate_aes_key
+
+KEY_STORE = "keys/aes_keys.json"
+KEY_TTL_SECONDS = 60 * 60 * 24 * 30  # 30 days
+
+
+def _load_keys():
+    if not os.path.exists(KEY_STORE):
+        return []
+    with open(KEY_STORE, "r") as f:
+        return json.load(f)
+
+
+def _save_keys(keys):
+    os.makedirs("keys", exist_ok=True)
+    with open(KEY_STORE, "w") as f:
+        json.dump(keys, f, indent=2)
+
+
+def get_active_key():
+    keys = _load_keys()
+    now = int(time.time())
+
+    for key in keys:
+        if key["expires_at"] > now:
+            return bytes.fromhex(key["key"]), key["key_id"]
+
+    return rotate_key()
+
+
+def rotate_key():
+    keys = _load_keys()
+    now = int(time.time())
+
+    new_key = generate_aes_key()
+    entry = {
+        "key_id": f"aes_{now}",
+        "key": new_key.hex(),
+        "created_at": now,
+        "expires_at": now + KEY_TTL_SECONDS
+    }
+
+    keys.append(entry)
+    _save_keys(keys)
+
+    return new_key, entry["key_id"]

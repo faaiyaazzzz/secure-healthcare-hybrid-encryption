@@ -1,0 +1,5 @@
+Patient Name: John Doe
+Age: 45
+Diagnosis: Type 2 Diabetes
+Prescription: Metformin
+Doctor: Dr. Smith

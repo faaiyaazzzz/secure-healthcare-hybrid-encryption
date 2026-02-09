@@ -1,0 +1,17 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Runtime / generated files
+secure_payload.json
+encrypted_record.json
+audit.log
+categorized_logs/
+
+# Crypto material (never commit secrets)
+keys/
+recipient_keys/*_private.pem
+
+# OS junk
+.DS_Store
+Thumbs.db
