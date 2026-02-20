@@ -1,7 +1,17 @@
 import hashlib
+import os
+
+# Use project-relative path for audit log
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+LOG_FILE = os.path.join(PROJECT_DIR, "audit.log")
+
 
 def verify_log():
-    with open("audit.log", "r") as f:
+    if not os.path.exists(LOG_FILE):
+        print("[INFO] No audit log found - starting fresh")
+        return
+        
+    with open(LOG_FILE, "r") as f:
         lines = f.readlines()
 
     prev = "0"
@@ -12,7 +22,6 @@ def verify_log():
 
         if hashlib.sha256(raw.encode()).hexdigest() != stored_hash:
             print("[FAIL] Log tampering detected")
-
             return
 
         if parts[-2] != prev:
@@ -26,3 +35,4 @@ def verify_log():
 
 if __name__ == "__main__":
     verify_log()
+

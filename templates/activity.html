@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Log - Secure Healthcare Crypto System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-y: auto;
+        }
+        .navbar { background: rgba(15, 12, 41, 0.95); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .logo-text { font-size: 1.4em; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #00ff88); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-menu { display: flex; gap: 30px; list-style: none; }
+        .nav-link { color: #aaa; text-decoration: none; padding: 10px; }
+        .nav-link:hover, .nav-link.active { color: #00d4ff; }
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .activity-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px; margin-bottom: 15px; }
+        .activity-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .activity-item:last-child { border-bottom: none; }
+        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.8em; }
+        .status-success { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><span>🔐</span><span class="logo-text">HealthCrypto</span></div>
+        <ul class="nav-menu">
+            <li><a href="{{ url_for('index') }}" class="nav-link">Home</a></li>
+            <li><a href="{{ url_for('profile') }}" class="nav-link">Profile</a></li>
+            <li><a href="{{ url_for('activity') }}" class="nav-link active">Activity</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1 style="margin-bottom: 30px;">📋 Activity Log</h1>
+        <div class="activity-card">
+            {% for activity in activities %}
+            <div class="activity-item">
+                <div>
+                    <strong>{{ activity.action }}</strong>
+                    <p style="color: #aaa; font-size: 0.9em;">{{ activity.time }}</p>
+                </div>
+                <span class="status-badge status-success">{{ activity.status }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

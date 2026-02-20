@@ -2,13 +2,15 @@ import sys
 from hybrid_encrypt import encrypt_workflow
 from hybrid_decrypt import decrypt_workflow
 from verify_audit_log import verify_log
+from secure_email_sender import send_encrypted_email_to_all
 
 def main():
     if len(sys.argv) < 2:
         print("Usage:")
         print("  python main.py encrypt")
         print("  python main.py encrypt-email <email>")
-        print("  python main.py decrypt")
+        print("  python main.py encrypt-email-all")
+        print("  python main.py decrypt <role>")
         print("  python main.py verify")
         return
 
@@ -26,8 +28,13 @@ def main():
             receiver_email=sys.argv[2]
         )
 
+    elif command == "encrypt-email-all":
+        # Encrypt and send to all recipients
+        encrypt_workflow(send_email_to_all=True)
+
     elif command == "decrypt":
-        decrypt_workflow()
+        role = sys.argv[2] if len(sys.argv) > 2 else "doctor"
+        decrypt_workflow(role)
 
     elif command == "verify":
         verify_log()
@@ -37,3 +44,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

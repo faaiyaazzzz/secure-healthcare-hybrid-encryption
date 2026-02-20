@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encrypt - Healthcare Crypto</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        h1 { color: #00ff88; font-size: 2em; }
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: linear-gradient(90deg, #00ff88, #00d4ff);
+            color: #1a1a2e;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+        .btn:hover { transform: scale(1.05); }
+        .output {
+            background: #0d0d0d;
+            border: 1px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Consolas', monospace;
+            color: #00ff88;
+            white-space: pre-wrap;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .back-link {
+            display: inline-block;
+            color: #00d4ff;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('index') }}" class="back-link">← Back to Dashboard</a>
+        
+        <header>
+            <h1>🔒 Encrypt Healthcare Data</h1>
+        </header>
+        
+        <div class="card">
+            <p style="margin-bottom: 20px; color: #aaa;">
+                Encrypt healthcare records using hybrid RSA-AES encryption (AES-256-GCM + RSA-2048).
+                This creates an encrypted payload that can be securely transmitted via email.
+            </p>
+            
+            <form method="POST">
+                <button type="submit" class="btn">Encrypt Data</button>
+            </form>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="output">
+                        {% for category, message in messages %}
+{{ message }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+</body>
+</html>
+

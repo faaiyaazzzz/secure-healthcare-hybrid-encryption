@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Secure Healthcare Crypto System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        /* Animated Background */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: linear-gradient(45deg, rgba(0, 212, 255, 0.3), rgba(0, 255, 136, 0.3));
+            border-radius: 50%;
+            animation: rise linear infinite;
+        }
+        
+        @keyframes rise {
+            0% {
+                bottom: -100px;
+                opacity: 0;
+                transform: translateX(0);
+            }
+            50% {
+                opacity: 0.6;
+            }
+            100% {
+                bottom: 120%;
+                opacity: 0;
+                transform: translateX(-100px);
+            }
+        }
+        
+        /* Floating shapes */
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        .shape-1 {
+            top: 10%;
+            left: 10%;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, #00d4ff, #00ff88);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation-delay: 0s;
+        }
+        
+        .shape-2 {
+            top: 60%;
+            right: 10%;
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            animation-delay: -5s;
+        }
+        
+        .shape-3 {
+            bottom: 10%;
+            left: 20%;
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(45deg, #a55eea, #26de81);
+            border-radius: 40% 60% 60% 40% / 70% 30% 70% 40%;
+            animation-delay: -10s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(20px, -30px) rotate(5deg); }
+            50% { transform: translate(-10px, 20px) rotate(-5deg); }
+            75% { transform: translate(30px, 10px) rotate(3deg); }
+        }
+        
+        .login-container { 
+            width: 100%; 
+            max-width: 420px; 
+            padding: 20px; 
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .login-box {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .login-header { text-align: center; margin-bottom: 35px; }
+        
+        .icon-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        
+        .icon-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.8; }
+        }
+        
+        .login-header .icon { 
+            font-size: 3.5em; 
+            display: block;
+            animation: bounce 2s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .login-header h1 {
+            font-size: 1.9em;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #00d4ff, #00ff88, #00d4ff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s linear infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+        
+        .login-header p { 
+            color: #bbb; 
+            font-size: 0.95em;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        
+        .tabs { 
+            display: flex; 
+            margin-bottom: 25px; 
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+        
+        .tab-slider {
+            position: absolute;
+            bottom: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            color: #888;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .tab:hover { color: #fff; }
+        
+        .tab.active { 
+            color: #00d4ff; 
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+        
+        .form-group { margin-bottom: 20px; position: relative; }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00d4ff;
+            font-weight: 500;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 25px rgba(0, 212, 255, 0.3),
+                        inset 0 0 10px rgba(0, 212, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .form-group input::placeholder { color: #666; }
+        
+        .form-group select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300d4ff' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+        }
+        
+        .form-group select option { background: #1a1a2e; color: #fff; }
+        
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 42px;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus + .input-icon {
+            color: #00d4ff;
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            color: #1a1a2e;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn-login:hover::before {
+            left: 100%;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.4);
+        }
+        
+        .btn-login:active {
+            transform: translateY(-1px);
+        }
+        
+        .back-link { 
+            display: block; 
+            text-align: center; 
+            margin-top: 25px; 
+            color: #aaa; 
+            text-decoration: none; 
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+        
+        .back-link:hover { 
+            color: #00d4ff;
+            transform: translateX(5px);
+        }
+        
+        .flash-messages { margin-bottom: 20px; }
+        
+        .flash {
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .flash.error { 
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(255, 107, 107, 0.1));
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+        }
+        
+        .flash.success { 
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0.1));
+            border: 1px solid #00ff88;
+            color: #00ff88;
+        }
+        
+        .role-info {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 255, 136, 0.05));
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 25px;
+            font-size: 0.8em;
+            color: #aaa;
+            transition: all 0.3s ease;
+        }
+        
+        .role-info:hover {
+            border-color: rgba(0, 212, 255, 0.4);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.1);
+        }
+        
+        .role-info h4 { 
+            color: #00d4ff; 
+            margin-bottom: 12px; 
+            font-size: 0.9em; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .role-info ul { list-style: none; padding: 0; }
+        
+        .role-info li { 
+            padding: 5px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .role-info li:hover {
+            padding-left: 10px;
+        }
+        
+        .role-info li strong { color: #00ff88; }
+        
+        .form-section { 
+            display: none; 
+            animation: fadeIn 0.4s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-section.active { display: block; }
+        
+        .forgot-link { text-align: center; margin-top: 15px; }
+        
+        .forgot-link a { 
+            color: #00d4ff; 
+            text-decoration: none; 
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .forgot-link a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #00d4ff;
+            transition: width 0.3s ease;
+        }
+        
+        .forgot-link a:hover::after { width: 100%; }
+        
+        /* Loading spinner */
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(0, 212, 255, 0.3);
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    <script>
+        // Create floating bubbles
+        function createBubbles() {
+            const bg = document.querySelector('.background-animation');
+            const bubbleCount = 15;
+            
+            for (let i = 0; i < bubbleCount; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                
+                const size = Math.random() * 40 + 20;
+                bubble.style.width = size + 'px';
+                bubble.style.height = size + 'px';
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                bubble.style.animationDelay = (Math.random() * 10) + 's';
+                
+                bg.appendChild(bubble);
+            }
+        }
+        
+        // Tab switching with animation
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.tab');
+            const sections = document.querySelectorAll('.form-section');
+            const slider = document.querySelector('.tab-slider');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            sections.forEach(f => f.classList.remove('active'));
+            
+            tab.classList.add('active');
+            
+            // Update slider position
+            const index = Array.from(tabs).indexOf(tab);
+            slider.style.width = (100 / tabs.length) + '%';
+            slider.style.left = (index * (100 / tabs.length)) + '%';
+            
+            if (tab.textContent.includes('Sign In')) {
+                document.getElementById('signin-section').classList.add('active');
+            } else if (tab.textContent.includes('Sign Up')) {
+                document.getElementById('signup-section').classList.add('active');
+            } else {
+                document.getElementById('forgot-section').classList.add('active');
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            createBubbles();
+            
+            // Set initial slider position
+            const tabs = document.querySelectorAll('.tab');
+            const slider = document.querySelector('.tab-slider');
+            if (tabs.length > 0 && slider) {
+                slider.style.width = (100 / tabs.length) + '%';
+                slider.style.left = '0%';
+            }
+            
+            // Form submission loading
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    const loading = document.querySelector('.loading');
+                    if (loading) {
+                        loading.style.display = 'flex';
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="background-animation">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+    
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <div class="icon-container">
+                    <div class="icon-glow"></div>
+                    <span class="icon">🔐</span>
+                </div>
+                <h1>Secure Healthcare</h1>
+                <p>Crypto System</p>
+            </div>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <div class="tabs">
+                <div class="tab-slider"></div>
+                <div class="tab active" onclick="switchTab(this)">Sign In</div>
+                <div class="tab" onclick="switchTab(this)">Sign Up</div>
+                <div class="tab" onclick="switchTab(this)">Forgot Password</div>
+            </div>
+            
+            <!-- Sign In Form -->
+            <form method="POST" action="{{ url_for('login') }}" id="signin-section" class="form-section active">
+                <input type="hidden" name="action" value="signin">
+                <div class="form-group">
+                    <label for="username">Username / Patient ID</label>
+                    <input type="text" id="username" name="username" placeholder="Enter username or patient ID" required>
+                    <span class="input-icon">👤</span>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                    <span class="input-icon">🔒</span>
+                </div>
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" name="role" required>
+                        <option value="" disabled selected>Select your role</option>
+                        <option value="doctor">👨‍⚕️ Doctor</option>
+                        <option value="nurse">👩‍⚕️ Nurse</option>
+                        <option value="admin">👨‍💻 Admin</option>
+                        <option value="patient">🏥 Patient</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-login">Sign In</button>
+                <div class="forgot-link">
+                    <a href="#" onclick="document.querySelectorAll('.tab')[2].click(); return false;">Forgot Password?</a>
+                </div>
+            </form>
+            
+            <!-- Sign Up Form -->
+            <form method="POST" action="{{ url_for('login') }}" id="signup-section" class="form-section">
+                <input type="hidden" name="action" value="signup">
+                <div class="form-group">
+                    <label for="signup_name">Full Name</label>
+                    <input type="text" id="signup_name" name="name" placeholder="Enter your full name" required>
+                    <span class="input-icon">📝</span>
+                </div>
+                <div class="form-group">
+                    <label for="signup_email">Email Address</label>
+                    <input type="email" id="signup_email" name="email" placeholder="Enter your email" required>
+                    <span class="input-icon">✉️</span>
+                </div>
+                <div class="form-group">
+                    <label for="signup_username">Username / Patient ID</label>
+                    <input type="text" id="signup_username" name="username" placeholder="Create a username or patient ID" required>
+                    <span class="input-icon">👤</span>
+                </div>
+                <div class="form-group">
+                    <label for="signup_password">Password</label>
+                    <input type="password" id="signup_password" name="password" placeholder="Create a password" required>
+                    <span class="input-icon">🔒</span>
+                </div>
+                <div class="form-group">
+                    <label for="signup_role">Role</label>
+                    <select id="signup_role" name="role" required>
+                        <option value="" disabled selected>Select your role</option>
+                        <option value="doctor">👨‍⚕️ Doctor</option>
+                        <option value="nurse">👩‍⚕️ Nurse</option>
+                        <option value="admin">👨‍💻 Admin</option>
+                        <option value="patient">🏥 Patient</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-login">Create Account</button>
+            </form>
+            
+            <!-- Forgot Password Form -->
+            <form method="POST" action="{{ url_for('login') }}" id="forgot-section" class="form-section">
+                <input type="hidden" name="action" value="forgot">
+                <div class="form-group">
+                    <label for="forgot_username">Username / Patient ID</label>
+                    <input type="text" id="forgot_username" name="username" placeholder="Enter your username or patient ID" required>
+                    <span class="input-icon">👤</span>
+                </div>
+                <div class="form-group">
+                    <label for="forgot_email">Email Address</label>
+                    <input type="email" id="forgot_email" name="email" placeholder="Enter your registered email" required>
+                    <span class="input-icon">✉️</span>
+                </div>
+                <button type="submit" class="btn-login">Reset Password</button>
+            </form>
+            
+            <a href="{{ url_for('index') }}" class="back-link">← Back to Home</a>
+            
+            <div class="role-info">
+                <h4>🔐 Role Permissions</h4>
+                <ul>
+                    <li><strong>👨‍⚕️ Doctor</strong> - Full access: patient_id, diagnosis, prescription, lab_results</li>
+                    <li><strong>👩‍⚕️ Nurse</strong> - Limited: patient_id, prescription, lab_results</li>
+                    <li><strong>👨‍💻 Admin</strong> - Audit info only</li>
+                    <li><strong>🏥 Patient</strong> - Own records access</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading">
+        <div class="spinner"></div>
+    </div>
+</body>
+</html>

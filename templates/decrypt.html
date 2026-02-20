@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decrypt - Healthcare Crypto</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        h1 { color: #ff6b6b; font-size: 2em; }
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 10px; color: #aaa; }
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #00d4ff;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 1em;
+        }
+        .btn {
+            background: linear-gradient(90deg, #ff6b6b, #ff9f43);
+            color: #1a1a2e;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+        .btn:hover { transform: scale(1.05); }
+        .output {
+            background: #0d0d0d;
+            border: 1px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Consolas', monospace;
+            color: #ff6b6b;
+            white-space: pre-wrap;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .back-link {
+            display: inline-block;
+            color: #00d4ff;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        .back-link:hover { text-decoration: underline; }
+        .info { background: rgba(0, 212, 255, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('index') }}" class="back-link">← Back to Dashboard</a>
+        
+        <header>
+            <h1>🔓 Decrypt Healthcare Data</h1>
+        </header>
+        
+        <div class="card">
+            <div class="info">
+                <strong>RBAC (Role-Based Access Control):</strong><br>
+                Different roles have access to different healthcare fields:<br>
+                • <strong>Doctor:</strong> All fields (patient_id, diagnosis, prescription, lab_results)<br>
+                • <strong>Nurse:</strong> Limited fields (patient_id, prescription, lab_results)<br>
+                • <strong>Admin:</strong> Audit info only
+            </div>
+            
+            <form method="POST">
+                <div class="form-group">
+                    <label for="role">Select Your Role:</label>
+                    <select name="role" id="role">
+                        <option value="doctor">Doctor (Full Access)</option>
+                        <option value="nurse">Nurse (Limited Access)</option>
+                        <option value="admin">Admin (Audit Only)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Decrypt Data</button>
+            </form>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="output">
+                        {% for category, message in messages %}
+{{ message }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+</body>
+</html>
+

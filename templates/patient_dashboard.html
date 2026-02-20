@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard - Secure Healthcare Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        .navbar {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .navbar .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .navbar .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .navbar .user-info span {
+            color: #00d4ff;
+        }
+        .navbar .logout-btn {
+            padding: 8px 20px;
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #ff6b6b;
+            border-radius: 8px;
+            color: #ff6b6b;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .navbar .logout-btn:hover {
+            background: rgba(255, 107, 107, 0.4);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .dashboard-header {
+            margin-bottom: 30px;
+        }
+        .dashboard-header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .dashboard-header p {
+            color: #aaa;
+        }
+        .patient-id-badge {
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid #00d4ff;
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 212, 255, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .card-header h3 {
+            font-size: 1.3em;
+            color: #00d4ff;
+        }
+        .card-header .icon {
+            font-size: 2em;
+        }
+        .report-field {
+            margin-bottom: 15px;
+        }
+        .report-field label {
+            display: block;
+            color: #aaa;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        .report-field .value {
+            font-size: 1.1em;
+            color: #fff;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        .report-field .value.empty {
+            color: #666;
+            font-style: italic;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+        }
+        .status-badge.active {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 1em;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            color: #1a1a2e;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        .flash {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+        .flash.error {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+        }
+        .flash.success {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+        }
+        .info-box {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #aaa;
+            font-size: 0.9em;
+        }
+        .no-records {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .no-records .icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🏥 Patient Portal</div>
+        <div class="nav-links">
+            <a href="{{ url_for('patient_dashboard') }}">📋 My Reports</a>
+            <a href="{{ url_for('patient_contact') }}">📞 Contact</a>
+        </div>
+        <div class="user-info">
+            <span>Welcome, {{ patient_name }}</span>
+            <span class="patient-id-badge">ID: {{ patient_id }}</span>
+            <a href="{{ url_for('patient_logout') }}" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>My Medical Reports</h1>
+            <p>View and download your secure medical records</p>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        {% if records %}
+        <div class="cards-grid">
+            {% for record in records %}
+            <div class="card">
+                <div class="card-header">
+                    <h3>📋 Medical Report</h3>
+                    <span class="status-badge active">Verified</span>
+                </div>
+                
+                <div class="report-field">
+                    <label>Patient ID</label>
+                    <div class="value">{{ record.patient_id }}</div>
+                </div>
+                
+                {% if record.diagnosis %}
+                <div class="report-field">
+                    <label>Diagnosis</label>
+                    <div class="value">{{ record.diagnosis }}</div>
+                </div>
+                {% endif %}
+                
+                {% if record.prescription %}
+                <div class="report-field">
+                    <label>Prescription</label>
+                    <div class="value">{{ record.prescription }}</div>
+                </div>
+                {% endif %}
+                
+                {% if record.lab_results %}
+                <div class="report-field">
+                    <label>Lab Results</label>
+                    <div class="value">{{ record.lab_results }}</div>
+                </div>
+                {% endif %}
+                
+                <div class="info-box">
+                    🔒 This record is encrypted and digitally signed for authenticity
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-records">
+            <div class="icon">📭</div>
+            <h3>No Records Found</h3>
+            <p>Your medical reports will appear here once uploaded by your healthcare provider.</p>
+        </div>
+        {% endif %}
+        
+        <div style="margin-top: 40px; text-align: center;">
+            <a href="{{ url_for('patient_login') }}" class="btn btn-primary">Refresh Reports</a>
+        </div>
+    </div>
+</body>
+</html>
+

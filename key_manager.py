@@ -3,7 +3,10 @@ import os
 import time
 from aes_gcm_utils import generate_aes_key
 
-KEY_STORE = "keys/aes_keys.json"
+# Use project-relative absolute path for key storage
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+KEYS_DIR = os.path.join(PROJECT_DIR, "keys")
+KEY_STORE = os.path.join(KEYS_DIR, "aes_keys.json")
 KEY_TTL_SECONDS = 60 * 60 * 24 * 30  # 30 days
 
 
@@ -15,7 +18,7 @@ def _load_keys():
 
 
 def _save_keys(keys):
-    os.makedirs("keys", exist_ok=True)
+    os.makedirs(os.path.dirname(KEY_STORE), exist_ok=True)
     with open(KEY_STORE, "w") as f:
         json.dump(keys, f, indent=2)
 

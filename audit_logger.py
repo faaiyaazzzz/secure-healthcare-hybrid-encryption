@@ -2,7 +2,10 @@ import hashlib
 import time
 import os
 
-LOG_FILE = "audit.log"
+# Use project-relative path for audit log
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+LOG_FILE = os.path.join(PROJECT_DIR, "audit.log")
+
 
 def _last_hash():
     if not os.path.exists(LOG_FILE):
@@ -10,6 +13,7 @@ def _last_hash():
     with open(LOG_FILE, "r") as f:
         last = f.readlines()[-1]
         return last.strip().split("|")[-1]
+
 
 def log_event(event_type, message):
     timestamp = int(time.time())
@@ -20,3 +24,4 @@ def log_event(event_type, message):
 
     with open(LOG_FILE, "a") as f:
         f.write(f"{raw}|{curr_hash}\n")
+

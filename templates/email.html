@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Email - Healthcare Crypto</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        h1 { color: #feca57; font-size: 2em; }
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 10px; color: #aaa; }
+        input[type="email"], input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #feca57;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 1em;
+        }
+        .btn {
+            background: linear-gradient(90deg, #feca57, #ff9f43);
+            color: #1a1a2e;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s;
+            margin-right: 10px;
+        }
+        .btn:hover { transform: scale(1.05); }
+        .btn-all {
+            background: linear-gradient(90deg, #00d4ff, #0984e3);
+            color: #fff;
+        }
+        .output {
+            background: #0d0d0d;
+            border: 1px solid #feca57;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Consolas', monospace;
+            color: #feca57;
+            white-space: pre-wrap;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .back-link {
+            display: inline-block;
+            color: #00d4ff;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('index') }}" class="back-link">← Back to Dashboard</a>
+        
+        <header>
+            <h1>📧 Send Secure Email</h1>
+        </header>
+        
+        <div class="card">
+            <p style="margin-bottom: 20px; color: #aaa;">
+                Send encrypted healthcare data to recipients via email. 
+                The system will generate a secure_payload.json file that contains 
+                the encrypted data and can be safely transmitted.
+            </p>
+            
+            <form method="POST">
+                <div class="form-group">
+                    <label for="email">Recipient Email:</label>
+                    <input type="email" name="email" id="email" placeholder="recipient@example.com">
+                </div>
+                <div class="form-group">
+                    <button type="submit" name="action" value="send_single" class="btn">Send to Single Recipient</button>
+                    <button type="submit" name="action" value="send_all" class="btn btn-all">Send to All Recipients</button>
+                </div>
+            </form>
+            
+            <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px;">
+                <p style="color: #aaa; margin-bottom: 10px;">Available Recipients:</p>
+                <ul style="color: #00d4ff; list-style: none; padding-left: 10px;">
+                    <li>📧 chintu01032005@gmail.com</li>
+                    <li>📧 doctor@example.com</li>
+                    <li>📧 test@example.com</li>
+                </ul>
+            </div>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="output">
+                        {% for category, message in messages %}
+{{ message }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+</body>
+</html>
+

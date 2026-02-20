@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security - Secure Healthcare Crypto System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-y: auto;
+        }
+        .navbar {
+            background: rgba(15, 12, 41, 0.95);
+            padding: 15px 40px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo-text {
+            font-size: 1.4em;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .nav-menu { display: flex; gap: 30px; list-style: none; }
+        .nav-link { color: #aaa; text-decoration: none; padding: 10px; }
+        .nav-link:hover, .nav-link.active { color: #00d4ff; }
+        .container { max-width: 700px; margin: 40px auto; padding: 0 20px; }
+        .security-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .security-card h2 { color: #00d4ff; margin-bottom: 20px; }
+        .security-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .security-item:last-child { border-bottom: none; }
+        .btn {
+            padding: 10px 20px;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><span>🔐</span><span class="logo-text">HealthCrypto</span></div>
+        <ul class="nav-menu">
+            <li><a href="{{ url_for('index') }}" class="nav-link">Home</a></li>
+            <li><a href="{{ url_for('profile') }}" class="nav-link">Profile</a></li>
+            <li><a href="{{ url_for('security') }}" class="nav-link active">Security</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1 style="margin-bottom: 30px;">🔐 Security Settings</h1>
+        <div class="security-card">
+            <h2>Password</h2>
+            <div class="security-item">
+                <div>
+                    <strong>Change Password</strong>
+                    <p style="color: #aaa; font-size: 0.9em;">Update your account password</p>
+                </div>
+                <button class="btn">Change</button>
+            </div>
+        </div>
+        <div class="security-card">
+            <h2>Two-Factor Authentication</h2>
+            <div class="security-item">
+                <div>
+                    <strong>2FA Status</strong>
+                    <p style="color: #aaa; font-size: 0.9em;">Add an extra layer of security</p>
+                </div>
+                <button class="btn">Enable</button>
+            </div>
+        </div>
+        <div class="security-card">
+            <h2>Active Sessions</h2>
+            <div class="security-item">
+                <div>
+                    <strong>Current Session</strong>
+                    <p style="color: #aaa; font-size: 0.9em;">This device</p>
+                </div>
+                <span style="color: #00ff88;">Active</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,170 @@
+[
+  {
+    "id": 1,
+    "user": "doctor",
+    "role": "doctor",
+    "message": "hii",
+    "timestamp": "2026-02-20 02:03:55",
+    "is_support": false
+  },
+  {
+    "id": 2,
+    "user": "doctor",
+    "role": "doctor",
+    "message": "How to decrypt files?",
+    "timestamp": "2026-02-20 02:04:20",
+    "is_support": false
+  },
+  {
+    "id": 3,
+    "user": "doctor",
+    "role": "doctor",
+    "message": "How to decrypt files?",
+    "timestamp": "2026-02-20 02:08:10",
+    "is_support": false
+  },
+  {
+    "id": 4,
+    "user": "doctor",
+    "role": "doctor",
+    "message": "hii",
+    "timestamp": "2026-02-20 14:02:09",
+    "is_support": false
+  },
+  {
+    "id": 5,
+    "user": "doctor",
+    "role": "doctor",
+    "message": "Account problem",
+    "timestamp": "2026-02-20 14:02:22",
+    "is_support": false
+  },
+  {
+    "id": 6,
+    "user": "doctor",
+    "role": "doctor",
+    "message": "hi",
+    "timestamp": "2026-02-20 14:06:51",
+    "is_support": false
+  },
+  {
+    "id": 7,
+    "user": "Support Bot",
+    "role": "support",
+    "message": "\ud83d\udc4b Hello! Welcome to Healthcare Crypto Support. How can I assist you today?",
+    "timestamp": "2026-02-20 14:06:51",
+    "is_support": true
+  },
+  {
+    "id": 8,
+    "user": "doctor",
+    "role": "doctor",
+    "message": "How to decrypt files?",
+    "timestamp": "2026-02-20 14:06:59",
+    "is_support": false
+  },
+  {
+    "id": 9,
+    "user": "Support Bot",
+    "role": "support",
+    "message": "\ud83d\udd13 For decryption: Visit the Decrypt page, enter your role (doctor/nurse), and provide the correct decryption key. Contact admin if you need key reset.",
+    "timestamp": "2026-02-20 14:06:59",
+    "is_support": true
+  },
+  {
+    "id": 10,
+    "user": "doctor",
+    "role": "doctor",
+    "message": "ok",
+    "timestamp": "2026-02-20 14:07:13",
+    "is_support": false
+  },
+  {
+    "id": 11,
+    "user": "Support Bot",
+    "role": "support",
+    "message": "\ud83d\udcdd I've received your message. Our support team will get back to you shortly. For urgent issues, call +1 (555) 911-HELP. Is there something specific I can help with?",
+    "timestamp": "2026-02-20 14:07:13",
+    "is_support": true
+  },
+  {
+    "id": 12,
+    "user": "doctor",
+    "role": "doctor",
+    "message": "by",
+    "timestamp": "2026-02-20 14:07:32",
+    "is_support": false
+  },
+  {
+    "id": 13,
+    "user": "Support Bot",
+    "role": "support",
+    "message": "\ud83d\udcdd I've received your message. Our support team will get back to you shortly. For urgent issues, call +1 (555) 911-HELP. Is there something specific I can help with?",
+    "timestamp": "2026-02-20 14:07:32",
+    "is_support": true
+  },
+  {
+    "id": 14,
+    "user": "doctor",
+    "role": "doctor",
+    "message": "Account problem",
+    "timestamp": "2026-02-20 14:10:41",
+    "is_support": false
+  },
+  {
+    "id": 15,
+    "user": "Support Bot",
+    "role": "support",
+    "message": "\ud83d\udcdd I've received your message. Our support team will get back to you shortly. For urgent issues, call +1 (555) 911-HELP. Is there something specific I can help with?",
+    "timestamp": "2026-02-20 14:10:41",
+    "is_support": true
+  },
+  {
+    "id": 16,
+    "user": "doctor",
+    "role": "doctor",
+    "message": "How to decrypt files?",
+    "timestamp": "2026-02-20 14:10:45",
+    "is_support": false
+  },
+  {
+    "id": 17,
+    "user": "Support Bot",
+    "role": "support",
+    "message": "\ud83d\udd13 For decryption: Visit the Decrypt page, enter your role (doctor/nurse), and provide the correct decryption key. Contact admin if you need key reset.",
+    "timestamp": "2026-02-20 14:10:45",
+    "is_support": true
+  },
+  {
+    "id": 18,
+    "user": "doctor",
+    "role": "doctor",
+    "message": "I need help with encryption",
+    "timestamp": "2026-02-20 14:10:49",
+    "is_support": false
+  },
+  {
+    "id": 19,
+    "user": "Support Bot",
+    "role": "support",
+    "message": "\ud83d\udd12 For encryption help: Go to the Encrypt page, select your data file, and click 'Encrypt'. Use a strong key for better security. Need more help?",
+    "timestamp": "2026-02-20 14:10:49",
+    "is_support": true
+  },
+  {
+    "id": 20,
+    "user": "doctor",
+    "role": "doctor",
+    "message": "Account problem",
+    "timestamp": "2026-02-20 14:26:56",
+    "is_support": false
+  },
+  {
+    "id": 21,
+    "user": "Support Bot",
+    "role": "support",
+    "message": "\ud83d\udcdd I've received your message. Our support team will get back to you shortly. For urgent issues, call +1 (555) 911-HELP. Is there something specific I can help with?",
+    "timestamp": "2026-02-20 14:26:56",
+    "is_support": true
+  }
+]

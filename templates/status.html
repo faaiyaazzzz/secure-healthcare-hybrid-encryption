@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Status - Healthcare Crypto</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        h1 { color: #5f27cd; font-size: 2em; }
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .status-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .status-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .status-label {
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+        .status-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .status-value.yes { color: #00ff88; }
+        .status-value.no { color: #ff6b6b; }
+        .back-link {
+            display: inline-block;
+            color: #00d4ff;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('index') }}" class="back-link">← Back to Dashboard</a>
+        
+        <header>
+            <h1>📈 System Status</h1>
+        </header>
+        
+        <div class="card">
+            <h3 style="margin-bottom: 20px; color: #5f27cd;">Current System State</h3>
+            
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-icon">🔑</div>
+                    <div class="status-label">Encryption Keys</div>
+                    <div class="status-value {{ 'yes' if status.keys_exist else 'no' }}">
+                        {{ '✓ Available' if status.keys_exist else '✗ Missing' }}
+                    </div>
+                </div>
+                
+                <div class="status-item">
+                    <div class="status-icon">👥</div>
+                    <div class="status-label">Recipient Keys</div>
+                    <div class="status-value {{ 'yes' if status.recipient_keys_exist else 'no' }}">
+                        {{ '✓ Available' if status.recipient_keys_exist else '✗ Missing' }}
+                    </div>
+                </div>
+                
+                <div class="status-item">
+                    <div class="status-icon">📧</div>
+                    <div class="status-label">Secure Payload</div>
+                    <div class="status-value {{ 'yes' if status.payload_exists else 'no' }}">
+                        {{ '✓ Present' if status.payload_exists else '✗ None' }}
+                    </div>
+                </div>
+                
+                <div class="status-item">
+                    <div class="status-icon">📊</div>
+                    <div class="status-label">Audit Log</div>
+                    <div class="status-value {{ 'yes' if status.audit_exists else 'no' }}">
+                        {{ '✓ Present' if status.audit_exists else '✗ None' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3 style="margin-bottom: 15px; color: #5f27cd;">Quick Actions</h3>
+            <p style="color: #aaa; margin-bottom: 15px;">
+                To get started with the system, follow this workflow:
+            </p>
+            <ol style="color: #aaa; padding-left: 20px; line-height: 1.8;">
+                <li>First, encrypt healthcare data using the Encrypt page</li>
+                <li>Decrypt the data using the Decrypt page with a selected role</li>
+                <li>Send encrypted email to a recipient</li>
+                <li>Receive and verify the email as the recipient</li>
+                <li>Verify the audit log integrity</li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>
+
