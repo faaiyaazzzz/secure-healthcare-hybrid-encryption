@@ -276,6 +276,9 @@
             padding: 25px;
             text-align: center;
             transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
         }
         
         .help-card:hover {
@@ -404,14 +407,12 @@
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar">
-        <div class="logo">
-            <span class="logo-icon">🔐</span>
-            <span class="logo-text">HealthCrypto</span>
-        </div>
-        
         <ul class="nav-menu">
             <li class="nav-item">
                 <a href="{{ url_for('index') }}" class="nav-link active">🏠 Home</a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('about') }}" class="nav-link">ℹ️ About</a>
             </li>
             <li class="nav-item dropdown">
                 <a href="#" class="nav-link">👤 Profile ▾</a>
@@ -426,12 +427,22 @@
                 <a href="#" class="nav-link">🛠️ Services ▾</a>
                 <div class="dropdown-content">
                     <a href="{{ url_for('lab_results') }}" class="dropdown-item">🧪 Lab Results</a>
+                    <a href="{{ url_for('prescriptions') }}" class="dropdown-item">💊 Prescriptions</a>
+                    <a href="{{ url_for('medical_reports') }}" class="dropdown-item">📄 Medical Reports</a>
+                    <a href="{{ url_for('appointments') }}" class="dropdown-item">📅 Appointments</a>
+                    <a href="{{ url_for('patient_records') }}" class="dropdown-item">📋 Patient Records</a>
+                    <a href="{{ url_for('encrypt_image') }}" class="dropdown-item">🖼️ Image Encryption</a>
+                    {% if session.get('role') == 'admin' %}
                     <a href="{{ url_for('encrypt') }}" class="dropdown-item">🔒 Encrypt Data</a>
                     <a href="{{ url_for('decrypt') }}" class="dropdown-item">🔓 Decrypt Data</a>
+                    {% endif %}
                     <a href="{{ url_for('send_email') }}" class="dropdown-item">📧 Send Email</a>
                     <a href="{{ url_for('receive_email') }}" class="dropdown-item">📥 Receive Email</a>
+                    {% if session.get('role') == 'admin' %}
                     <a href="{{ url_for('verify_audit') }}" class="dropdown-item">📊 Audit Log</a>
+                    <a href="{{ url_for('tamper_test') }}" class="dropdown-item">⚔️ Tamper Test</a>
                     <a href="{{ url_for('status') }}" class="dropdown-item">📈 System Status</a>
+                    {% endif %}
                 </div>
             </li>
             <li class="nav-item dropdown">
@@ -443,20 +454,27 @@
             </li>
         </ul>
         
-        {% if session.get('logged_in') %}
-        <div class="user-profile">
-            <div class="user-avatar">
-                {{ session.get('user', 'U')|upper }}
+        <div style="display: flex; align-items: center; gap: 20px;">
+            {% if session.get('logged_in') %}
+            <div class="user-profile">
+                <div class="user-avatar">
+                    {{ session.get('user', 'U')|upper }}
+                </div>
+                <div class="user-info">
+                    <span class="user-name">{{ session.get('user', 'User') }}</span>
+                    <span class="user-role">{{ session.get('role', 'User') }}</span>
+                </div>
+                <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
             </div>
-            <div class="user-info">
-                <span class="user-name">{{ session.get('user', 'User') }}</span>
-                <span class="user-role">{{ session.get('role', 'User') }}</span>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn-logout" style="background: linear-gradient(90deg, #00d4ff, #00ff88); color: #1a1a2e;">Login</a>
+            {% endif %}
+
+            <div class="logo">
+                <span class="logo-icon">🔐</span>
+                <span class="logo-text">HealthCrypto</span>
             </div>
-            <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
         </div>
-        {% else %}
-        <a href="{{ url_for('login') }}" class="btn-logout" style="background: linear-gradient(90deg, #00d4ff, #00ff88); color: #1a1a2e;">Login</a>
-        {% endif %}
     </nav>
     
     <div class="container">
@@ -502,18 +520,43 @@
         </div>
         
         <div class="services-grid">
-            <a href="{{ url_for('patient_login') }}" class="service-card">
-                <span class="service-icon">🏥</span>
-                <h3>Patient Portal</h3>
-                <p>Login or sign up to securely view your medical reports and health records</p>
-            </a>
-            
             <a href="{{ url_for('lab_results') }}" class="service-card">
                 <span class="service-icon">🧪</span>
                 <h3>Lab Results</h3>
                 <p>View, add, and manage patient lab test results and medical reports</p>
             </a>
             
+            <a href="{{ url_for('prescriptions') }}" class="service-card">
+                <span class="service-icon">💊</span>
+                <h3>Prescriptions</h3>
+                <p>Issue and manage digital prescriptions securely with RSA-AES</p>
+            </a>
+            
+            <a href="{{ url_for('medical_reports') }}" class="service-card">
+                <span class="service-icon">📄</span>
+                <h3>Medical Reports</h3>
+                <p>Securely access and view patient medical histories and reports</p>
+            </a>
+            
+            <a href="{{ url_for('appointments') }}" class="service-card">
+                <span class="service-icon">📅</span>
+                <h3>Appointments</h3>
+                <p>Manage patient consultations and check upcoming schedules</p>
+            </a>
+            
+            <a href="{{ url_for('patient_records') }}" class="service-card">
+                <span class="service-icon">📋</span>
+                <h3>Patient Records</h3>
+                <p>Access unified patient clinical data and demographic information</p>
+            </a>
+            
+            <a href="{{ url_for('encrypt_image') }}" class="service-card">
+                <span class="service-icon">🖼️</span>
+                <h3>Medical Image Encryption</h3>
+                <p>Securely encrypt medical images (X-rays, MRIs) using hybrid RSA-AES with Cipher Image generation</p>
+            </a>
+            
+            {% if session.get('role') == 'admin' %}
             <a href="{{ url_for('encrypt') }}" class="service-card">
                 <span class="service-icon">🔒</span>
                 <h3>Encrypt Data</h3>
@@ -525,6 +568,7 @@
                 <h3>Decrypt Data</h3>
                 <p>Decrypt with RBAC role-based access control for different user roles</p>
             </a>
+            {% endif %}
             
             <a href="{{ url_for('send_email') }}" class="service-card">
                 <span class="service-icon">📧</span>
@@ -538,6 +582,7 @@
                 <p>Receive and verify encrypted email payload with signature validation</p>
             </a>
             
+            {% if session.get('role') == 'admin' %}
             <a href="{{ url_for('verify_audit') }}" class="service-card">
                 <span class="service-icon">📊</span>
                 <h3>Verify Audit Log</h3>
@@ -549,12 +594,15 @@
                 <h3>Tamper Testing</h3>
                 <p>Red Team: Test payload and audit tampering detection systems</p>
             </a>
+            {% endif %}
             
+            {% if session.get('role') == 'admin' %}
             <a href="{{ url_for('status') }}" class="service-card">
                 <span class="service-icon">📈</span>
                 <h3>System Status</h3>
                 <p>Check keys, payloads, and system state in real-time</p>
             </a>
+            {% endif %}
         </div>
         
         <!-- Help/Support Section -->
@@ -562,29 +610,29 @@
             <h2 class="section-title">❓ Help & Support</h2>
             
             <div class="help-grid">
-                <div class="help-card">
+                <a href="{{ url_for('help_page') }}" class="help-card">
                     <span class="help-icon">📖</span>
                     <h4>Documentation</h4>
                     <p>Read our comprehensive guides and documentation</p>
-                </div>
+                </a>
                 
-                <div class="help-card">
+                <a href="{{ url_for('tutorials') }}" class="help-card">
                     <span class="help-icon">🎥</span>
                     <h4>Video Tutorials</h4>
                     <p>Watch step-by-step video tutorials</p>
-                </div>
+                </a>
                 
-<a href="{{ url_for('live_chat') }}" class="help-card" style="text-decoration: none; cursor: pointer;">
+                <a href="{{ url_for('live_chat') }}" class="help-card">
                     <span class="help-icon">💬</span>
                     <h4>Live Chat</h4>
                     <p>Chat with our support team in real-time</p>
                 </a>
                 
-                <div class="help-card">
+                <a href="{{ url_for('contact_support') }}" class="help-card">
                     <span class="help-icon">📧</span>
                     <h4>Contact Us</h4>
-                    <p>Email us at support@healthcrypto.com</p>
-                </div>
+                    <p>Get in touch with our technical support team</p>
+                </a>
             </div>
         </div>
     </div>

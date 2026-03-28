@@ -3,222 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient Dashboard - Secure Healthcare Portal</title>
+    <title>Patient Dashboard - Secure Healthcare Crypto System</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
             min-height: 100vh;
             color: #fff;
+            overflow-y: auto;
         }
+        
         .navbar {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px 40px;
+            background: rgba(15, 12, 41, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 15px 40px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .navbar .logo {
-            font-size: 1.5em;
+        
+        .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo-icon { font-size: 2em; }
+        .logo-text {
+            font-size: 1.4em;
             font-weight: bold;
             background: linear-gradient(90deg, #00d4ff, #00ff88);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .navbar .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .navbar .user-info span {
-            color: #00d4ff;
-        }
-        .navbar .logout-btn {
-            padding: 8px 20px;
-            background: rgba(255, 107, 107, 0.2);
-            border: 1px solid #ff6b6b;
-            border-radius: 8px;
-            color: #ff6b6b;
+        
+        .nav-menu { display: flex; align-items: center; gap: 30px; list-style: none; }
+        .nav-link {
+            color: #aaa;
             text-decoration: none;
+            font-weight: 500;
+            padding: 10px 15px;
+            border-radius: 8px;
             transition: all 0.3s ease;
         }
-        .navbar .logout-btn:hover {
-            background: rgba(255, 107, 107, 0.4);
+        .nav-link:hover, .nav-link.active {
+            color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
         }
+        
         .container {
             max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
+            margin: 0 auto;
+            padding: 40px 20px;
         }
-        .dashboard-header {
-            margin-bottom: 30px;
-        }
-        .dashboard-header h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-        .dashboard-header p {
-            color: #aaa;
-        }
-        .patient-id-badge {
-            display: inline-block;
-            background: rgba(0, 212, 255, 0.2);
-            border: 1px solid #00d4ff;
+        
+        .welcome-section {
+            background: linear-gradient(90deg, rgba(0, 212, 255, 0.1), rgba(0, 255, 136, 0.1));
+            border: 1px solid rgba(0, 212, 255, 0.2);
             border-radius: 20px;
-            padding: 8px 20px;
-            font-size: 0.9em;
-            margin-top: 10px;
+            padding: 40px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .cards-grid {
+        
+        .welcome-text h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .welcome-text p { color: #aaa; font-size: 1.1em; }
+        
+        .patient-id-badge {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #00d4ff;
+            padding: 10px 20px;
+            border-radius: 50px;
+            color: #00d4ff;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        .services-section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
         }
-        .card {
+
+        .service-card {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 15px;
             padding: 25px;
+            text-decoration: none;
+            color: #fff;
             transition: all 0.3s ease;
+            text-align: center;
         }
-        .card:hover {
+
+        .service-card:hover {
             transform: translateY(-5px);
-            border-color: rgba(0, 212, 255, 0.5);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #00d4ff;
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.1);
         }
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+        .service-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            display: block;
         }
-        .card-header h3 {
-            font-size: 1.3em;
+
+        .service-card h3 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
             color: #00d4ff;
         }
-        .card-header .icon {
-            font-size: 2em;
-        }
-        .report-field {
-            margin-bottom: 15px;
-        }
-        .report-field label {
-            display: block;
+
+        .service-card p {
+            font-size: 0.9em;
             color: #aaa;
-            font-size: 0.85em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
+            line-height: 1.4;
         }
-        .report-field .value {
-            font-size: 1.1em;
-            color: #fff;
-            padding: 10px 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
         }
-        .report-field .value.empty {
-            color: #666;
-            font-style: italic;
-        }
-        .status-badge {
-            display: inline-block;
-            padding: 5px 15px;
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            font-size: 0.8em;
-            text-transform: uppercase;
-        }
-        .status-badge.active {
-            background: rgba(0, 255, 136, 0.2);
-            border: 1px solid #00ff88;
-            color: #00ff88;
-        }
-        .btn {
-            display: inline-block;
-            padding: 12px 25px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
+            padding: 30px;
             transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
-            font-size: 1em;
         }
-        .btn-primary {
-            background: linear-gradient(90deg, #00d4ff, #00ff88);
-            color: #1a1a2e;
+        
+        .card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(0, 212, 255, 0.3);
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
         }
-        .flash-messages {
-            margin-bottom: 20px;
-        }
-        .flash {
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            font-size: 0.9em;
-        }
-        .flash.error {
-            background: rgba(255, 107, 107, 0.2);
-            border: 1px solid #ff6b6b;
-            color: #ff6b6b;
-        }
-        .flash.success {
-            background: rgba(0, 255, 136, 0.2);
-            border: 1px solid #00ff88;
-            color: #00ff88;
-        }
-        .info-box {
+        
+        .card-icon {
+            font-size: 2em;
+            width: 50px;
+            height: 50px;
             background: rgba(0, 212, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            color: #aaa;
-            font-size: 0.9em;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .no-records {
+        
+        .card-title { font-size: 1.4em; color: #fff; font-weight: 600; }
+        
+        .data-list { list-style: none; }
+        
+        .data-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #00d4ff;
+        }
+        
+        .data-item h4 { color: #00ff88; margin-bottom: 5px; }
+        .data-item p { color: #ccc; font-size: 0.9em; margin-bottom: 5px; }
+        .data-meta { font-size: 0.8em; color: #666; display: flex; justify-content: space-between; }
+        
+        html { scroll-behavior: smooth; }
+
+        .btn-action {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid #00d4ff;
+            color: #00d4ff;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .btn-action:hover {
+            background: #00d4ff;
+            color: #1a1a2e;
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
             text-align: center;
-            padding: 40px;
+            padding: 40px 20px;
             color: #666;
         }
-        .no-records .icon {
-            font-size: 4em;
-            margin-bottom: 20px;
+        
+        .empty-icon { font-size: 3em; margin-bottom: 15px; display: block; }
+        
+        .flash-messages { margin-bottom: 20px; }
+        .flash {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            color: #00ff88;
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo">🏥 Patient Portal</div>
-        <div class="nav-links">
-            <a href="{{ url_for('patient_dashboard') }}">📋 My Reports</a>
-            <a href="{{ url_for('patient_contact') }}">📞 Contact</a>
-        </div>
-        <div class="user-info">
-            <span>Welcome, {{ patient_name }}</span>
-            <span class="patient-id-badge">ID: {{ patient_id }}</span>
-            <a href="{{ url_for('patient_logout') }}" class="logout-btn">Logout</a>
-        </div>
+        <ul class="nav-menu">
+            <li><a href="{{ url_for('logout') }}" class="nav-link" style="color: #ff6b6b;">Logout</a></li>
+        </ul>
+        <a href="{{ url_for('patient_dashboard') }}" class="logo">
+            <span class="logo-icon">🏥</span>
+            <span class="logo-text">PatientPortal</span>
+        </a>
     </nav>
     
     <div class="container">
-        <div class="dashboard-header">
-            <h1>My Medical Reports</h1>
-            <p>View and download your secure medical records</p>
-        </div>
-        
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <div class="flash-messages">
@@ -229,59 +257,182 @@
             {% endif %}
         {% endwith %}
         
-        {% if records %}
-        <div class="cards-grid">
-            {% for record in records %}
-            <div class="card">
+        <div class="welcome-section">
+            <div class="welcome-text">
+                <h1>Hello, {{ patient_name }}!</h1>
+                <p>Welcome to your secure healthcare dashboard. All your records are encrypted and private.</p>
+            </div>
+            <div style="text-align: right;">
+                <div class="patient-id-badge">ID: {{ patient_id }}</div>
+                <div style="margin-top: 10px; font-size: 0.8em; color: #00ff88;">● Status: Protected</div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid" style="margin-bottom: 40px;">
+            <div class="card" style="background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%);">
                 <div class="card-header">
-                    <h3>📋 Medical Report</h3>
-                    <span class="status-badge active">Verified</span>
+                    <div class="card-icon" style="color: #00d4ff;">📊</div>
+                    <h2 class="card-title">Health Overview</h2>
                 </div>
-                
-                <div class="report-field">
-                    <label>Patient ID</label>
-                    <div class="value">{{ record.patient_id }}</div>
-                </div>
-                
-                {% if record.diagnosis %}
-                <div class="report-field">
-                    <label>Diagnosis</label>
-                    <div class="value">{{ record.diagnosis }}</div>
-                </div>
-                {% endif %}
-                
-                {% if record.prescription %}
-                <div class="report-field">
-                    <label>Prescription</label>
-                    <div class="value">{{ record.prescription }}</div>
-                </div>
-                {% endif %}
-                
-                {% if record.lab_results %}
-                <div class="report-field">
-                    <label>Lab Results</label>
-                    <div class="value">{{ record.lab_results }}</div>
-                </div>
-                {% endif %}
-                
-                <div class="info-box">
-                    🔒 This record is encrypted and digitally signed for authenticity
+                <div style="display: flex; justify-content: space-around; text-align: center;">
+                    <div>
+                        <div style="font-size: 1.8em; font-weight: bold; color: #00ff88;">{{ prescriptions|length }}</div>
+                        <div style="font-size: 0.8em; color: #aaa;">Active Meds</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.8em; font-weight: bold; color: #00d4ff;">{{ lab_results|length }}</div>
+                        <div style="font-size: 0.8em; color: #aaa;">Lab Reports</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.8em; font-weight: bold; color: #feca57;">{{ appointments|length }}</div>
+                        <div style="font-size: 0.8em; color: #aaa;">Appointments</div>
+                    </div>
                 </div>
             </div>
-            {% endfor %}
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="color: #00ff88;">⚡</div>
+                    <h2 class="card-title">Quick Actions</h2>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <a href="{{ url_for('download_id') }}" class="btn-action" style="font-size: 0.8em; padding: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center;">Download ID Card</a>
+                    <form action="{{ url_for('request_access') }}" method="POST">
+                        <button type="submit" class="btn-action" style="font-size: 0.8em; padding: 8px; width: 100%;">Request Access</button>
+                    </form>
+                    <a href="{{ url_for('settings') }}" class="btn-action" style="font-size: 0.8em; padding: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center;">Update Info</a>
+                    <a href="{{ url_for('help_page') }}" class="btn-action" style="font-size: 0.8em; padding: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center;">Help Center</a>
+                </div>
+            </div>
         </div>
-        {% else %}
-        <div class="no-records">
-            <div class="icon">📭</div>
-            <h3>No Records Found</h3>
-            <p>Your medical reports will appear here once uploaded by your healthcare provider.</p>
-        </div>
-        {% endif %}
         
-        <div style="margin-top: 40px; text-align: center;">
-            <a href="{{ url_for('patient_login') }}" class="btn btn-primary">Refresh Reports</a>
+        <!-- Services Section -->
+        <div class="services-section">
+            <h2 class="section-title">🏥 Patient Services</h2>
+            <div class="services-grid">
+                <a href="#reports" class="service-card">
+                    <span class="service-icon">📄</span>
+                    <h3>Medical Reports</h3>
+                    <p>View your secure diagnostic reports and medical history</p>
+                </a>
+                
+                <a href="#prescriptions" class="service-card">
+                    <span class="service-icon">💊</span>
+                    <h3>My Prescriptions</h3>
+                    <p>Access your active and past digital prescriptions</p>
+                </a>
+                
+                <a href="#appointments" class="service-card">
+                    <span class="service-icon">📅</span>
+                    <h3>Book Appointment</h3>
+                    <p>Schedule a new consultation with your healthcare provider</p>
+                </a>
+                
+                <a href="{{ url_for('live_chat') }}" class="service-card">
+                    <span class="service-icon">💬</span>
+                    <h3>Support Chat</h3>
+                    <p>Chat with our healthcare assistant for real-time help</p>
+                </a>
+                
+                <a href="{{ url_for('tutorials') }}" class="service-card">
+                    <span class="service-icon">🎥</span>
+                    <h3>Video Guides</h3>
+                    <p>Learn how to use the portal and understand your records</p>
+                </a>
+                
+                <a href="{{ url_for('help_page') }}" class="service-card">
+                    <span class="service-icon">📖</span>
+                    <h3>Help Center</h3>
+                    <p>Access comprehensive documentation and FAQs</p>
+                </a>
+            </div>
+        </div>
+        
+        <h2 class="section-title">📊 Health Records Overview</h2>
+        <div class="dashboard-grid">
+            <!-- Prescriptions -->
+            <div class="card" id="prescriptions">
+                <div class="card-header">
+                    <div class="card-icon" style="color: #00d4ff; background: rgba(0, 212, 255, 0.1);">💊</div>
+                    <h2 class="card-title">My Prescriptions</h2>
+                </div>
+                <div class="data-list">
+                    {% if prescriptions %}
+                        {% for p in prescriptions %}
+                        <div class="data-item">
+                            <h4>{{ p.medication }}</h4>
+                            <p><strong>Dosage:</strong> {{ p.dosage }}</p>
+                            <p><strong>Instructions:</strong> {{ p.instructions }}</p>
+                            <div class="data-meta">
+                                <span>Dr. {{ p.doctor }}</span>
+                                <span>Verified SECURE</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <span class="empty-icon">📄</span>
+                            <p>No active prescriptions found.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Medical Reports -->
+            <div class="card" id="reports">
+                <div class="card-header">
+                    <div class="card-icon" style="color: #00ff88; background: rgba(0, 255, 136, 0.1);">📄</div>
+                    <h2 class="card-title">Medical Reports</h2>
+                </div>
+                <div class="data-list">
+                    {% if reports %}
+                        {% for r in reports %}
+                        <div class="data-item" style="border-left-color: #00ff88;">
+                            <h4>{{ r.diagnosis }}</h4>
+                            <p>{{ r.notes }}</p>
+                            <div class="data-meta">
+                                <span>By: {{ r.doctor }}</span>
+                                <span>AES-256 Protected</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <span class="empty-icon">📁</span>
+                            <p>No medical reports available.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Appointments -->
+            <div class="card" id="appointments">
+                <div class="card-header">
+                    <div class="card-icon" style="color: #feca57; background: rgba(254, 202, 87, 0.1);">📅</div>
+                    <h2 class="card-title">Upcoming Appointments</h2>
+                </div>
+                <div class="data-list">
+                    {% if appointments %}
+                        {% for a in appointments %}
+                        <div class="data-item" style="border-left-color: #feca57;">
+                            <h4>{{ a.reason }}</h4>
+                            <p><strong>Date:</strong> {{ a.date }}</p>
+                            <p><strong>Time:</strong> {{ a.time }}</p>
+                            <div class="data-meta">
+                                <span>Dr. {{ a.doctor }}</span>
+                                <span>{{ a.status }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <span class="empty-icon">⏳</span>
+                            <p>No upcoming appointments.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </body>
 </html>
-

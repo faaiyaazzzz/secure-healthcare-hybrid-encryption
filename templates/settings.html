@@ -94,10 +94,6 @@
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo">
-            <span class="logo-icon">🔐</span>
-            <span class="logo-text">HealthCrypto</span>
-        </div>
         <ul class="nav-menu">
             <li><a href="{{ url_for('index') }}" class="nav-link">🏠 Home</a></li>
             <li><a href="{{ url_for('profile') }}" class="nav-link">👤 Profile</a></li>
@@ -108,6 +104,10 @@
             <div class="user-avatar">{{ user.username|upper }}</div>
             <span>{{ user.username }}</span>
             <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+        </div>
+        <div class="logo">
+            <span class="logo-icon">🔐</span>
+            <span class="logo-text">HealthCrypto</span>
         </div>
     </nav>
     <div class="container">

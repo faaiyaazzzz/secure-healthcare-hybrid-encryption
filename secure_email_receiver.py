@@ -139,8 +139,24 @@ def decrypt_received_payload(payload_path, receiver_email, role="doctor", verify
 
     print("\n[OK] Email integrity verified.")
 
-    # This is still RBAC-encrypted data
-    rbac_encrypted_record = json.loads(plaintext.decode())
+    # Check if this is a medical image package
+    try:
+        decrypted_data = json.loads(plaintext.decode())
+        
+        if isinstance(decrypted_data, dict) and decrypted_data.get('package_type') == 'medical_image':
+            print("\n[OK] Decrypted Medical Image Package:")
+            print(f"  - Original Filename: {decrypted_data.get('filename')}")
+            print(f"  - Timestamp: {decrypted_data.get('timestamp')}")
+            print(f"  - Sent by: {decrypted_data.get('doctor')}")
+            print(f"  - Key ID: {decrypted_data.get('key_id')}")
+            print("\n[INFO] To view the image, the cipher data needs to be decrypted with the active AES key.")
+            return True
+            
+        # Otherwise, treat as standard RBAC-encrypted data
+        rbac_encrypted_record = decrypted_data
+    except json.JSONDecodeError:
+        print("[ERROR] Decrypted payload is not valid JSON")
+        return False
 
     # Apply RBAC decryption
     final_data = decrypt_record(rbac_encrypted_record, role=role)

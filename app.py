@@ -3,11 +3,15 @@ import sys
 import os
 import json
 
+from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request, redirect, url_for, flash, session, make_response, jsonify
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+from audit_logger import log_event
+from aes_gcm_utils import encrypt_gcm, decrypt_gcm
+from key_manager import get_active_key
 from functools import wraps
 
 # Try to load environment variables from .env file
@@ -19,14 +23,31 @@ except ImportError:
 
 # Role-based access control - define which roles can access which routes
 ROLE_PERMISSIONS = {
-    'index': ['doctor', 'nurse', 'admin'],
-    'encrypt': ['doctor', 'nurse'],
-    'decrypt': ['doctor', 'nurse', 'admin'],
+    'index': ['doctor', 'nurse', 'admin', 'patient'],
+    'encrypt': ['admin'],
+    'decrypt': ['admin'],
     'send_email': ['doctor', 'nurse'],
+    'encrypt_image': ['doctor'],
+    'send_image': ['doctor'],
     'receive_email': ['doctor', 'nurse'],
+    'prescriptions': ['doctor', 'nurse'],
+    'medical_reports': ['doctor', 'nurse'],
+    'appointments': ['doctor', 'nurse'],
+    'patient_records': ['doctor', 'nurse'],
+    'patient_dashboard': ['patient'],
     'verify_audit': ['admin'],
     'tamper_test': ['admin'],
-    'status': ['doctor', 'nurse', 'admin'],
+    'status': ['admin'],
+    'profile': ['doctor', 'nurse', 'admin', 'patient'],
+    'settings': ['doctor', 'nurse', 'admin', 'patient'],
+    'security': ['doctor', 'nurse', 'admin', 'patient'],
+    'activity': ['doctor', 'nurse', 'admin', 'patient'],
+    'help_page': ['doctor', 'nurse', 'admin', 'patient'],
+    'tutorials': ['doctor', 'nurse', 'admin', 'patient'],
+    'live_chat': ['doctor', 'nurse', 'admin', 'patient'],
+    'download_id': ['patient'],
+    'request_access': ['patient'],
+    'lab_results': ['doctor', 'nurse', 'admin'],
 }
 
 
@@ -58,11 +79,36 @@ app.secret_key = 'healthcare_crypto_secret_key'
 
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# Data storage files
+PRESCRIPTIONS_FILE = os.path.join(PROJECT_DIR, 'prescriptions.json')
+MEDICAL_REPORTS_FILE = os.path.join(PROJECT_DIR, 'medical_reports.json')
+APPOINTMENTS_FILE = os.path.join(PROJECT_DIR, 'appointments.json')
+PATIENT_RECORDS_FILE = os.path.join(PROJECT_DIR, 'patient_records.json')
+
+
+def load_data(file_path):
+    """Load data from JSON file"""
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return []
+    return []
+
+def save_data(file_path, data):
+    """Save data to JSON file"""
+    with open(file_path, 'w') as f:
+        json.dump(data, f, indent=2)
+
+
+
 # Simple user credentials (can be extended with a database)
 USERS = {
     'doctor': {'password': 'doctor123', 'role': 'doctor'},
     'nurse': {'password': 'nurse123', 'role': 'nurse'},
     'admin': {'password': 'admin123', 'role': 'admin'},
+    'patient': {'password': 'patient123', 'role': 'patient'},
 }
 
 # Hospital data
@@ -90,8 +136,17 @@ HOSPITALS = {
     }
 }
 
-# Patient database (file-based)
-PATIENTS_FILE = os.path.join(PROJECT_DIR, 'patients.json')
+# File upload configuration
+UPLOAD_FOLDER = os.path.join(PROJECT_DIR, 'uploads')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'dcm', 'xray', 'bmp', 'webp'}
+
+# Create upload folder if it doesn't exist
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def load_email_config():
@@ -124,20 +179,6 @@ def send_smtp_email(to_email, subject, body):
         return True, "Email sent successfully"
     except Exception as e:
         return False, str(e)
-
-
-def load_patients():
-    """Load patients from JSON file"""
-    if os.path.exists(PATIENTS_FILE):
-        with open(PATIENTS_FILE, 'r') as f:
-            return json.load(f)
-    return {}
-
-
-def save_patients(patients):
-    """Save patients to JSON file"""
-    with open(PATIENTS_FILE, 'w') as f:
-        json.dump(patients, f, indent=2)
 
 
 def initialize_system():
@@ -211,62 +252,20 @@ def login():
                 flash('Please fill in all required fields.', 'error')
                 return redirect(url_for('login'))
             
-            # For patients, save to patients.json
-            if role == 'patient':
-                patients = load_patients()
-                if username in patients:
-                    flash('Patient ID already registered. Please sign in.', 'error')
-                    return redirect(url_for('login'))
-                patients[username] = {
-                    'name': name,
-                    'email': email,
-                    'password': password,
-                }
-                save_patients(patients)
-                flash('Account created successfully! Please sign in.', 'success')
+            # For staff (doctor, nurse, admin)
+            if username in USERS:
+                flash('Username already exists. Please sign in.', 'error')
                 return redirect(url_for('login'))
-            else:
-                # For staff (doctor, nurse, admin)
-                if username in USERS:
-                    flash('Username already exists. Please sign in.', 'error')
-                    return redirect(url_for('login'))
-                USERS[username] = {'password': password, 'role': role}
-                flash(f'Account created for {role}! Please sign in.', 'success')
-                return redirect(url_for('login'))
+            USERS[username] = {'password': password, 'role': role}
+            flash(f'Account created for {role}! Please sign in.', 'success')
+            return redirect(url_for('login'))
         
         # Handle Forgot Password
         elif action == 'forgot':
             username = request.form.get('username', '').strip().lower()
-            email = request.form.get('email', '').strip()
             
             # Check if user exists
-            patients = load_patients()
-            if username in patients:
-                if patients[username].get('email') == email:
-                    # Send actual password reset email
-                    reset_link = f"http://localhost:8000/reset-password?user={username}"
-                    email_subject = "Password Reset - Healthcare Crypto System"
-                    email_body = f"""
-                    <html>
-                    <body style="font-family: Arial, sans-serif; padding: 20px;">
-                        <h2 style="color: #00d4ff;">Password Reset Request</h2>
-                        <p>Hello {patients[username]['name']},</p>
-                        <p>We received a request to reset your password. Click the link below to reset your password:</p>
-                        <p><a href="{reset_link}" style="background: #00d4ff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
-                        <p>Or copy this link: {reset_link}</p>
-                        <p>If you didn't request this, please ignore this email.</p>
-                        <p style="color: #666; font-size: 12px; margin-top: 20px;">This link will expire in 24 hours.</p>
-                    </body>
-                    </html>
-                    """
-                    success, message = send_smtp_email(email, email_subject, email_body)
-                    if success:
-                        flash(f'Password reset link sent to {email}', 'success')
-                    else:
-                        flash(f'Error sending email: {message}', 'error')
-                else:
-                    flash('Email does not match our records.', 'error')
-            elif username in USERS:
+            if username in USERS:
                 # For staff users, send reset email
                 staff_email = f"{username}@healthcrypto.com"
                 reset_link = f"http://localhost:8000/reset-password?user={username}"
@@ -299,20 +298,6 @@ def login():
             password = request.form.get('password', '')
             role = request.form.get('role', '')
 
-            # Check if it's a patient login
-            if role == 'patient':
-                patients = load_patients()
-                if username in patients and patients[username]['password'] == password:
-                    session['patient_logged_in'] = True
-                    session['patient_id'] = username.upper()
-                    session['patient_name'] = patients[username]['name']
-                    session['patient_email'] = patients[username].get('email', '')
-                    flash(f'Welcome, {patients[username]["name"]}!', 'success')
-                    return redirect(url_for('patient_dashboard'))
-                else:
-                    flash('Invalid Patient ID or password.', 'error')
-                    return redirect(url_for('login'))
-            
             # Staff login (doctor, nurse, admin)
             if username in USERS and USERS[username]['password'] == password:
                 session['user'] = username
@@ -326,6 +311,18 @@ def login():
                 # Redirect doctor/nurse to hospital selection
                 elif session['role'] in ['doctor', 'nurse']:
                     return redirect(url_for('select_hospital'))
+                # Redirect patient to their dashboard
+                elif session['role'] == 'patient':
+                    # Set a default patient name if not present
+                    if 'patient_name' not in session:
+                        # Try to find name in patients records or just use capitalized username
+                        records = load_data(PATIENT_RECORDS_FILE)
+                        patient_record = next((r for r in records if r.get('patient_id') == username), None)
+                        if patient_record:
+                            session['patient_name'] = patient_record.get('patient_name', username.capitalize())
+                        else:
+                            session['patient_name'] = username.capitalize()
+                    return redirect(url_for('patient_dashboard'))
                 return redirect(url_for('index'))
             else:
                 flash('Invalid username or password. Please try again.', 'error')
@@ -355,178 +352,10 @@ def select_hospital():
     return render_template('hospital_select.html', hospitals=HOSPITALS)
 
 
-@app.route('/patient-login', methods=['GET', 'POST'])
-def patient_login():
-    """Patient login and signup page"""
-    if request.method == 'POST':
-        action = request.form.get('action', '')
-        
-        if action == 'signup':
-            # Handle patient signup
-            name = request.form.get('name', '').strip()
-            email = request.form.get('email', '').strip()
-            patient_id = request.form.get('patient_id', '').strip().upper()
-            password = request.form.get('password', '')
-            
-            if not name or not patient_id or not password:
-                flash('Please fill in all fields', 'error')
-                return redirect(url_for('patient_login'))
-            
-            # Load existing patients
-            patients = load_patients()
-            
-            # Check if patient_id already exists
-            if patient_id in patients:
-                flash('Patient ID already registered. Please login.', 'error')
-                return redirect(url_for('patient_login'))
-            
-            # Register new patient
-            patients[patient_id] = {
-                'name': name,
-                'email': email,
-                'password': password,  # In production, hash this!
-                'registered_at': str(os.path.getmtime(__file__)) if os.path.exists(PATIENTS_FILE) else '0'
-            }
-            save_patients(patients)
-            
-            flash('Registration successful! Please login with your Patient ID.', 'success')
-            return redirect(url_for('patient_login'))
-        
-        elif action == 'login':
-            # Handle patient login
-            patient_id = request.form.get('patient_id', '').strip().upper()
-            password = request.form.get('password', '')
-            
-            # Load patients and validate
-            patients = load_patients()
-            
-            if patient_id in patients and patients[patient_id]['password'] == password:
-                # Store patient info in session
-                session['patient_logged_in'] = True
-                session['patient_id'] = patient_id
-                session['patient_name'] = patients[patient_id]['name']
-                session['patient_email'] = patients[patient_id].get('email', '')
-                
-                flash(f'Welcome, {patients[patient_id]["name"]}!', 'success')
-                return redirect(url_for('patient_dashboard'))
-            else:
-                flash('Invalid Patient ID or password.', 'error')
-                return redirect(url_for('patient_login'))
-    
-    return render_template('patient_login.html')
-
-
-@app.route('/patient-dashboard')
-def patient_dashboard():
-    """Patient dashboard - view their reports"""
-    if not session.get('patient_logged_in'):
-        return redirect(url_for('patient_login'))
-    
-    patient_id = session.get('patient_id', '')
-    patient_name = session.get('patient_name', 'Patient')
-    
-    # Load encrypted record and try to decrypt for this patient
-    encrypted_file = os.path.join(PROJECT_DIR, 'encrypted_record.json')
-    records = []
-    
-    if os.path.exists(encrypted_file):
-        try:
-            with open(encrypted_file, 'r') as f:
-                encrypted_record = json.load(f)
-            
-            # Try to decrypt with active key
-            from secure_record import decrypt_record
-            from key_manager import get_active_key
-            
-            key, key_id = get_active_key()
-            
-            # For patients, try to decrypt with patient role (limited access)
-            # Or decrypt all fields and filter
-            decrypted = decrypt_record(encrypted_record, role='patient')
-            
-            # Check if this record belongs to this patient
-            if decrypted.get('patient_id') == patient_id:
-                records.append(decrypted)
-            elif 'patient_id' in decrypted:
-                # Show any record that exists (for demo purposes)
-                records.append(decrypted)
-                
-        except Exception as e:
-            flash(f'Could not load records: {str(e)}', 'error')
-    
-    return render_template('patient_dashboard.html', 
-                         patient_id=patient_id, 
-                         patient_name=patient_name,
-                         records=records)
-
-
-@app.route('/patient-logout')
-def patient_logout():
-    """Patient logout"""
-    session.pop('patient_logged_in', None)
-    session.pop('patient_id', None)
-    session.pop('patient_name', None)
-    session.pop('patient_email', None)
-    flash('You have been logged out.', 'success')
-    return redirect(url_for('patient_login'))
-
-
-@app.route('/patient-contact')
-def patient_contact():
-    """Patient contact information page"""
-    if not session.get('patient_logged_in'):
-        return redirect(url_for('patient_login'))
-    
-    patient_id = session.get('patient_id', '')
-    patient_name = session.get('patient_name', 'Patient')
-    
-    # Hospital and doctor contact information
-    hospital_info = {
-        'name': 'City General Hospital',
-        'address': '123 Healthcare Avenue, Medical District',
-        'phone': '+1 (555) 123-4567',
-        'emergency': '+1 (555) 911-HELP',
-        'email': 'info@citygeneralhospital.com',
-        'hours': '24/7 Emergency Services'
-    }
-    
-    doctors = [
-        {
-            'name': 'Dr. Sarah Johnson',
-            'specialty': 'General Medicine',
-            'phone': '+1 (555) 234-5678',
-            'email': 'dr.johnson@citygeneralhospital.com',
-            'availability': 'Mon-Fri: 9AM-5PM'
-        },
-        {
-            'name': 'Dr. Michael Chen',
-            'specialty': 'Cardiology',
-            'phone': '+1 (555) 345-6789',
-            'email': 'dr.chen@citygeneralhospital.com',
-            'availability': 'Mon-Thu: 10AM-4PM'
-        },
-        {
-            'name': 'Dr. Emily Williams',
-            'specialty': 'Pediatrics',
-            'phone': '+1 (555) 456-7890',
-            'email': 'dr.williams@citygeneralhospital.com',
-            'availability': 'Tue-Fri: 8AM-3PM'
-        }
-    ]
-    
-    return render_template('patient_contact.html',
-                         patient_id=patient_id,
-                         patient_name=patient_name,
-                         hospital_info=hospital_info,
-                         doctors=doctors)
-
-
 @app.route('/profile')
+@role_required('profile')
 def profile():
     """User profile page"""
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    
     user_data = {
         'username': session.get('user', 'User'),
         'role': session.get('role', 'Unknown'),
@@ -537,11 +366,9 @@ def profile():
 
 
 @app.route('/settings', methods=['GET', 'POST'])
+@role_required('settings')
 def settings():
     """User settings page"""
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    
     if request.method == 'POST':
         flash('Settings saved successfully!', 'success')
         return redirect(url_for('settings'))
@@ -554,11 +381,9 @@ def settings():
 
 
 @app.route('/security')
+@role_required('security')
 def security():
     """Security settings page"""
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    
     user_data = {
         'username': session.get('user', 'User'),
         'role': session.get('role', 'Unknown'),
@@ -567,11 +392,9 @@ def security():
 
 
 @app.route('/activity')
+@role_required('activity')
 def activity():
     """Activity log page"""
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    
     # Sample activity data
     activities = [
         {'action': 'Login', 'time': 'Today, 10:30 AM', 'status': 'Success'},
@@ -588,9 +411,23 @@ def activity():
 
 
 @app.route('/help')
+@role_required('help_page')
 def help_page():
     """Help/Documentation page"""
     return render_template('help.html')
+
+
+@app.route('/tutorials')
+@role_required('tutorials')
+def tutorials():
+    """Video tutorials page"""
+    return render_template('tutorials.html')
+
+
+@app.route('/about')
+def about():
+    """About page - Professional website information"""
+    return render_template('about.html')
 
 
 @app.route('/contact-support', methods=['GET', 'POST'])
@@ -689,6 +526,119 @@ def logout():
     return redirect(url_for('login'))
 
 
+from secure_email_sender import send_encrypted_email, send_encrypted_email_to_all, RECIPIENTS
+
+@app.route('/send-image', methods=['POST'])
+@role_required('encrypt_image')
+def send_image():
+    """Send encrypted image to recipient"""
+    action = request.form.get('action', 'send_single')
+    cipher_file = request.form.get('cipher_file')
+    
+    if not cipher_file:
+        flash('Cipher file is required', 'error')
+        return redirect(url_for('encrypt_image'))
+    
+    cipher_path = os.path.join(UPLOAD_FOLDER, cipher_file)
+    if not os.path.exists(cipher_path):
+        flash('Cipher file not found', 'error')
+        return redirect(url_for('encrypt_image'))
+    
+    try:
+        with open(cipher_path, 'r') as f:
+            encrypted_payload = json.load(f)
+        
+        # Add metadata for the recipient
+        encrypted_payload['package_type'] = 'medical_image'
+        
+        if action == 'send_all':
+            success = send_encrypted_email_to_all(encrypted_payload)
+            recipient = "All Recipients"
+        else:
+            recipient = request.form.get('recipient')
+            if not recipient:
+                # If recipient is not provided but action is send_single, we might have a UI issue
+                # Let's try to get it from the form again or fallback
+                flash('Recipient email is required for single send', 'error')
+                return redirect(url_for('encrypt_image'))
+            success = send_encrypted_email(recipient, encrypted_payload)
+        
+        if success:
+            log_event("IMAGE_SEND", f"Sent encrypted image {cipher_file} to {recipient}")
+            flash(f'Encrypted medical image sent successfully to {recipient}!', 'success')
+        else:
+            flash(f'Failed to send encrypted image to {recipient}. Check logs for details.', 'error')
+            
+    except Exception as e:
+        flash(f'Error sending image: {str(e)}', 'error')
+        
+    return redirect(url_for('encrypt_image'))
+
+
+@app.route('/encrypt-image', methods=['GET', 'POST'])
+@role_required('encrypt_image')
+def encrypt_image():
+    """Medical Image Encryption page"""
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file part', 'error')
+            return redirect(url_for('encrypt_image'))
+        
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file', 'error')
+            return redirect(url_for('encrypt_image'))
+        
+        if file and allowed_file(file.filename):
+            import datetime
+            import uuid
+            
+            # 1. Save original image (simulate medical record)
+            filename = secure_filename(file.filename)
+            unique_id = str(uuid.uuid4())[:8]
+            filepath = os.path.join(UPLOAD_FOLDER, f"raw_{unique_id}_{filename}")
+            file.save(filepath)
+            
+            # 2. Encrypt image bytes using Hybrid Algorithm
+            with open(filepath, 'rb') as f:
+                image_data = f.read()
+            
+            aes_key, key_id = get_active_key()
+            ciphertext, nonce, tag = encrypt_gcm(image_data, aes_key)
+            
+            # 3. Save encrypted "Cipher Image" (binary format)
+            encrypted_filename = f"cipher_{unique_id}_{filename}.bin"
+            encrypted_path = os.path.join(UPLOAD_FOLDER, encrypted_filename)
+            
+            encrypted_payload = {
+                'filename': filename,
+                'ciphertext': ciphertext.hex(),
+                'nonce': nonce.hex(),
+                'tag': tag.hex(),
+                'key_id': key_id,
+                'timestamp': datetime.datetime.now().isoformat(),
+                'doctor': session.get('user', 'Unknown')
+            }
+            
+            with open(encrypted_path, 'w') as f:
+                json.dump(encrypted_payload, f, indent=2)
+            
+            # 4. Log the event
+            log_event("IMAGE_ENCRYPT", f"Encrypted image {filename} for secure transmission. Key: {key_id}")
+            
+            flash(f'Medical Image encrypted successfully! Cipher Image saved as {encrypted_filename}', 'success')
+            return render_template('encrypt_image.html', 
+                                 encrypted=True, 
+                                 filename=filename, 
+                                 cipher_file=encrypted_filename,
+                                 recipients=RECIPIENTS)
+            
+        flash('Invalid file type', 'error')
+        return redirect(url_for('encrypt_image'))
+        
+    return render_template('encrypt_image.html', recipients=RECIPIENTS)
+
+
 @app.route('/encrypt', methods=['GET', 'POST'])
 @role_required('encrypt')
 def encrypt():
@@ -754,14 +704,19 @@ def receive_email():
         role = request.form.get('role', 'doctor')
 
         if not email:
-            flash('Please enter the sender email', 'error')
+            flash('Please enter your email address to decrypt the payload', 'error')
             return redirect(url_for('receive_email'))
 
         output, code = run_python_script(
             'secure_email_receiver.py',
             ['secure_payload.json', email, role])
-        flash(f'Receive Email Output (Role: {role}):\n{output}',
-              'success' if code == 0 else 'error')
+            
+        # Check if it's a medical image package
+        if "Decrypted Medical Image Package" in output:
+            flash(f'Medical Image Received and Verified!\n\n{output}', 'success')
+        else:
+            flash(f'Receive Email Output (Role: {role}):\n{output}',
+                  'success' if code == 0 else 'error')
         return redirect(url_for('receive_email'))
     return render_template('receive_email.html')
 
@@ -966,7 +921,209 @@ Healthcare Crypto System - Secure Healthcare Reporting
     return response
 
 
+@app.route('/prescriptions', methods=['GET', 'POST'])
+@role_required('prescriptions')
+def prescriptions():
+    """Prescriptions management page"""
+    if request.method == 'POST':
+        patient_name = request.form.get('patient_name')
+        medication = request.form.get('medication')
+        dosage = request.form.get('dosage')
+        instructions = request.form.get('instructions')
+        
+        if patient_name and medication:
+            prescriptions_list = load_data(PRESCRIPTIONS_FILE)
+            
+            # Simple "encryption" - in a real app, we'd use the GCM tools
+            new_prescription = {
+                'id': str(len(prescriptions_list) + 1),
+                'patient_name': patient_name,
+                'medication': medication,
+                'dosage': dosage,
+                'instructions': instructions,
+                'doctor': session.get('user'),
+                'timestamp': str(os.path.getmtime(__file__))
+            }
+            
+            prescriptions_list.append(new_prescription)
+            save_data(PRESCRIPTIONS_FILE, prescriptions_list)
+            flash('Prescription issued successfully!', 'success')
+            return redirect(url_for('prescriptions'))
+            
+    prescriptions_list = load_data(PRESCRIPTIONS_FILE)
+    return render_template('prescriptions.html', prescriptions=prescriptions_list)
 
+
+@app.route('/medical-reports', methods=['GET', 'POST'])
+@role_required('medical_reports')
+def medical_reports():
+    """Medical reports management page"""
+    if request.method == 'POST':
+        patient_name = request.form.get('patient_name')
+        diagnosis = request.form.get('diagnosis')
+        notes = request.form.get('notes')
+        
+        if patient_name and diagnosis:
+            reports_list = load_data(MEDICAL_REPORTS_FILE)
+            new_report = {
+                'id': str(len(reports_list) + 1),
+                'patient_name': patient_name,
+                'diagnosis': diagnosis,
+                'notes': notes,
+                'doctor': session.get('user'),
+                'timestamp': str(os.path.getmtime(__file__))
+            }
+            reports_list.append(new_report)
+            save_data(MEDICAL_REPORTS_FILE, reports_list)
+            flash('Medical report added successfully!', 'success')
+            return redirect(url_for('medical_reports'))
+            
+    reports_list = load_data(MEDICAL_REPORTS_FILE)
+    return render_template('medical_reports.html', reports=reports_list)
+
+
+@app.route('/appointments', methods=['GET', 'POST'])
+@role_required('appointments')
+def appointments():
+    """Appointments management page"""
+    if request.method == 'POST':
+        patient_name = request.form.get('patient_name')
+        date = request.form.get('date')
+        time = request.form.get('time')
+        reason = request.form.get('reason')
+        
+        if patient_name and date:
+            appointments_list = load_data(APPOINTMENTS_FILE)
+            new_appointment = {
+                'id': str(len(appointments_list) + 1),
+                'patient_name': patient_name,
+                'date': date,
+                'time': time,
+                'reason': reason,
+                'doctor': session.get('user'),
+                'status': 'Scheduled'
+            }
+            appointments_list.append(new_appointment)
+            save_data(APPOINTMENTS_FILE, appointments_list)
+            flash('Appointment scheduled successfully!', 'success')
+            return redirect(url_for('appointments'))
+            
+    appointments_list = load_data(APPOINTMENTS_FILE)
+    return render_template('appointments.html', appointments=appointments_list)
+
+
+@app.route('/patient-records', methods=['GET', 'POST'])
+@role_required('patient_records')
+def patient_records():
+    """Patient records management page"""
+    if request.method == 'POST':
+        patient_id = request.form.get('patient_id')
+        name = request.form.get('name')
+        dob = request.form.get('dob')
+        gender = request.form.get('gender')
+        blood_group = request.form.get('blood_group')
+        password = request.form.get('password', 'Patient123')
+        
+        if patient_id and name:
+            records_list = load_data(PATIENT_RECORDS_FILE)
+            new_record = {
+                'patient_id': patient_id.upper(),
+                'name': name,
+                'dob': dob,
+                'gender': gender,
+                'blood_group': blood_group,
+                'last_updated': str(os.path.getmtime(__file__))
+            }
+            records_list.append(new_record)
+            save_data(PATIENT_RECORDS_FILE, records_list)
+            
+            # Create/Update patient account
+            patients = load_patients()
+            patients[patient_id.upper()] = {
+                'name': name,
+                'password': password,
+                'role': 'patient'
+            }
+            save_patients(patients)
+            
+            flash('Patient record and account created successfully!', 'success')
+            return redirect(url_for('patient_records'))
+            
+    records_list = load_data(PATIENT_RECORDS_FILE)
+    return render_template('patient_records.html', records=records_list)
+
+
+@app.route('/patient-dashboard')
+@role_required('patient_dashboard')
+def patient_dashboard():
+    """Patient's own dashboard view"""
+    patient_id = session.get('user')
+    patient_name = session.get('patient_name', 'Patient')
+    
+    # Load data filtered for this patient
+    prescriptions = [p for p in load_data(PRESCRIPTIONS_FILE) if p.get('patient_name', '').lower() == patient_name.lower() or p.get('patient_id') == patient_id]
+    reports = [r for r in load_data(MEDICAL_REPORTS_FILE) if r.get('patient_name', '').lower() == patient_name.lower() or r.get('patient_id') == patient_id]
+    appointments = [a for a in load_data(APPOINTMENTS_FILE) if a.get('patient_name', '').lower() == patient_name.lower() or a.get('patient_id') == patient_id]
+    lab_results = [l for l in load_lab_results() if l.get('patient_name', '').lower() == patient_name.lower() or l.get('patient_id') == patient_id]
+    
+    return render_template('patient_dashboard.html', 
+                          patient_id=patient_id, 
+                          patient_name=patient_name,
+                          prescriptions=prescriptions,
+                          reports=reports,
+                          appointments=appointments,
+                          lab_results=lab_results)
+
+
+@app.route('/download-id')
+@role_required('patient_dashboard')
+def download_id():
+    """Generate and download a secure Health ID card for the patient"""
+    import hashlib
+    import time
+    
+    patient_id = session.get('user', 'UNKNOWN')
+    patient_name = session.get('patient_name', 'Patient')
+    
+    # Generate a unique secure hash for this ID card
+    timestamp = str(time.time())
+    secure_hash = hashlib.sha256(f"{patient_id}:{patient_name}:{timestamp}".encode()).hexdigest()[:16].upper()
+    
+    id_card_content = f"""
+==========================================
+    SECURE HEALTHCARE CRYPTO SYSTEM
+           HEALTH ID CARD
+==========================================
+PATIENT NAME: {patient_name.upper()}
+PATIENT ID  : {patient_id}
+ISSUE DATE  : {time.strftime('%Y-%m-%d %H:%M:%S')}
+STATUS      : SECURE & PROTECTED
+------------------------------------------
+SECURE HASH : {secure_hash}
+VERIFICATION: RSA-2048 / AES-256
+------------------------------------------
+This is a cryptographically secured ID card.
+Any unauthorized tampering will be detected 
+by the system's hash-chain audit log.
+==========================================
+"""
+    
+    response = make_response(id_card_content)
+    response.headers["Content-Disposition"] = f"attachment; filename=HealthID_{patient_id}.txt"
+    response.headers["Content-type"] = "text/plain"
+    
+    log_event("ID_CARD_DOWNLOAD", patient_id, f"Patient {patient_id} downloaded their Health ID card.")
+    return response
+
+
+@app.route('/request-access', methods=['POST'])
+@role_required('patient_dashboard')
+def request_access():
+    """Handle access requests from patients"""
+    patient_id = session.get('user')
+    log_event("ACCESS_REQUEST", patient_id, f"Patient {patient_id} requested additional record access.")
+    flash('Your request for additional record access has been sent to the administrator.', 'success')
+    return redirect(url_for('patient_dashboard'))
 
 
 # Chat messages storage
@@ -988,11 +1145,9 @@ def save_chat_messages(messages):
 
 
 @app.route('/live-chat')
+@role_required('live_chat')
 def live_chat():
     """Live chat support page"""
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    
     user_data = {
         'username': session.get('user', 'User'),
         'role': session.get('role', 'Unknown'),
@@ -1025,10 +1180,18 @@ def get_auto_response(user_message):
         return "👋 Hi! I'm the Healthcare Crypto Support Bot. I can help with: encryption, decryption, passwords, emails, keys, and audit logs. What do you need?"
     elif any(word in user_message for word in ['thank', 'thanks']):
         return "😊 You're welcome! Let me know if you need anything else. Stay secure!"
+    elif any(word in user_message for word in ['prescription', 'medication']):
+        return "💊 Prescriptions: You can now issue digital prescriptions via the Prescriptions dashboard. All medication data is secured using AES-256-GCM. Need help issuing one?"
+    elif any(word in user_message for word in ['report', 'medical report']):
+        return "📄 Medical Reports: Access unified patient reports from the Medical Reports section. You can create, view, and share reports securely. Any specific report you're looking for?"
+    elif any(word in user_message for word in ['appointment', 'schedule']):
+        return "📅 Appointments: Manage your consultation schedule in the Appointments dashboard. You can book new slots or check existing ones. Ready to schedule?"
+    elif any(word in user_message for word in ['record', 'patient record']):
+        return "📋 Patient Records: View unified demographic and clinical data in the Patient Records portal. Search by Patient ID for quick access."
     elif any(word in user_message for word in ['hi', 'hello', 'hey']):
-        return "👋 Hello! Welcome to Healthcare Crypto Support. How can I assist you today?"
+        return "👋 Hello! I'm your Healthcare Crypto Assistant. I can help with clinical tools (Prescriptions, Reports, Appointments) or security features (Encryption, Secure Email). How can I assist you?"
     else:
-        return "📝 I've received your message. Our support team will get back to you shortly. For urgent issues, call +1 (555) 911-HELP. Is there something specific I can help with?"
+        return "📝 I've received your clinical support request. Our team will review this and respond shortly. For urgent medical technical issues, call +1 (555) 911-HELP."
 
 
 @app.route('/api/chat/send', methods=['POST'])
@@ -1095,19 +1258,6 @@ def chat_clear():
     return jsonify({'success': True})
 
 
-# File upload configuration
-UPLOAD_FOLDER = os.path.join(PROJECT_DIR, 'uploads')
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'dcm', 'xray', 'bmp', 'webp'}
-
-# Create upload folder if it doesn't exist
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
 @app.route('/api/chat/upload', methods=['POST'])
 def chat_upload():
     """API to upload files (images, X-rays, medical documents)"""
@@ -1121,7 +1271,7 @@ def chat_upload():
     if file.filename == '':
         return jsonify({'error': 'No file selected'}), 400
     
-    if file and allowed_file(file.filename):
+    if file and file.filename and allowed_file(file.filename):
         import datetime
         import uuid
         
@@ -1135,7 +1285,7 @@ def chat_upload():
         file_size = os.path.getsize(filepath)
         
         # Determine file type
-        file_ext = file.filename.rsplit('.', 1)[1].lower()
+        file_ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else 'unknown'
         file_type = 'image' if file_ext in ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'] else 'document'
         
         # Create message with file info

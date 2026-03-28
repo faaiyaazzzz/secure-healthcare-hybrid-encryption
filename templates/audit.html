@@ -3,105 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify Audit - Healthcare Crypto</title>
+    <title>Verify Audit Log - Secure Healthcare Crypto System</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            min-height: 100vh;
-            color: #fff;
-            padding: 20px;
-        }
-        .container { max-width: 800px; margin: 0 auto; }
-        header {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        h1 { color: #54a0ff; font-size: 2em; }
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 20px;
-        }
-        .btn {
-            background: linear-gradient(90deg, #54a0ff, #2e86de);
-            color: #1a1a2e;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.1em;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: transform 0.3s;
-        }
-        .btn:hover { transform: scale(1.05); }
-        .output {
-            background: #0d0d0d;
-            border: 1px solid #54a0ff;
-            border-radius: 10px;
-            padding: 20px;
-            font-family: 'Consolas', monospace;
-            color: #54a0ff;
-            white-space: pre-wrap;
-            margin-top: 20px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .output.success { border-color: #00ff88; color: #00ff88; }
-        .output.error { border-color: #ff6b6b; color: #ff6b6b; }
-        .back-link {
-            display: inline-block;
-            color: #00d4ff;
-            text-decoration: none;
-            margin-bottom: 20px;
-        }
-        .back-link:hover { text-decoration: underline; }
-        .info { background: rgba(0, 212, 255, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); min-height: 100vh; color: #fff; overflow-y: auto; }
+        .navbar { background: rgba(15, 12, 41, 0.95); backdrop-filter: blur(20px); padding: 15px 40px; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(0, 212, 255, 0.2); display: flex; justify-content: space-between; align-items: center; animation: fadeInDown 0.5s ease-out; }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo-icon { font-size: 2em; }
+        .logo-text { font-size: 1.4em; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #00ff88); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-menu { display: flex; align-items: center; gap: 30px; list-style: none; }
+        .nav-link { color: #aaa; text-decoration: none; font-weight: 500; padding: 10px 15px; border-radius: 8px; transition: all 0.3s ease; }
+        .nav-link:hover, .nav-link.active { color: #00d4ff; background: rgba(0, 212, 255, 0.1); }
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; animation: fadeInUp 0.8s ease-out; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .page-header { text-align: center; margin-bottom: 40px; }
+        .header-icon { font-size: 4em; display: inline-block; animation: float 3s ease-in-out infinite; margin-bottom: 20px; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        .page-header h1 { font-size: 2.5em; margin-bottom: 15px; background: linear-gradient(90deg, #fed330, #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .page-header p { color: #aaa; font-size: 1.1em; max-width: 600px; margin: 0 auto; }
+        .card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 35px; margin-bottom: 25px; transition: all 0.3s ease; animation: slideInCards 0.6s ease-out forwards; opacity: 0; }
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        @keyframes slideInCards { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .card:hover { transform: translateY(-5px); border-color: rgba(254, 211, 48, 0.3); box-shadow: 0 20px 50px rgba(254, 211, 48, 0.1); }
+        .card-title { font-size: 1.4em; color: #fed330; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .card p { color: #aaa; line-height: 1.7; }
+        .btn-audit { display: block; width: 100%; max-width: 300px; margin: 20px auto 0; padding: 18px 40px; background: linear-gradient(90deg, #fed330, #ff6b6b); color: #1a1a2e; border: none; border-radius: 15px; font-size: 1.2em; font-weight: bold; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 2px; position: relative; overflow: hidden; }
+        .btn-audit::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transition: left 0.5s ease; }
+        .btn-audit:hover::before { left: 100%; }
+        .btn-audit:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(254, 211, 48, 0.4); }
+        .output-box { background: #0a0a0a; border: 1px solid rgba(254, 211, 48, 0.3); border-radius: 15px; padding: 25px; margin-top: 30px; font-family: 'Consolas', monospace; color: #fed330; white-space: pre-wrap; max-height: 400px; overflow-y: auto; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: #aaa; text-decoration: none; padding: 12px 25px; margin-bottom: 25px; border-radius: 10px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.05); }
+        .back-link:hover { color: #00d4ff; background: rgba(0, 212, 255, 0.1); transform: translateX(-5px); }
+        .flash { padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        .flash.success { background: rgba(0, 255, 136, 0.15); border: 1px solid #00ff88; color: #00ff88; }
+        .flash.error { background: rgba(255, 107, 107, 0.15); border: 1px solid #ff6b6b; color: #ff6b6b; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+        .feature-item { display: flex; align-items: center; gap: 10px; padding: 12px; background: rgba(0, 0, 0, 0.2); border-radius: 10px; transition: all 0.3s ease; }
+        .feature-item:hover { background: rgba(254, 211, 48, 0.1); transform: translateX(5px); }
+        .feature-icon { font-size: 1.3em; }
+        @media (max-width: 768px) { .navbar { flex-direction: column; gap: 15px; padding: 15px 20px; } }
     </style>
 </head>
 <body>
+    <nav class="navbar">
+        <ul class="nav-menu">
+            <li><a href="{{ url_for('index') }}" class="nav-link">🏠 Home</a></li>
+            <li><a href="{{ url_for('about') }}" class="nav-link">ℹ️ About</a></li>
+            <li><a href="{{ url_for('profile') }}" class="nav-link">👤 Profile</a></li>
+            <li><a href="{{ url_for('logout') }}" class="nav-link" style="color: #ff6b6b;">Logout</a></li>
+        </ul>
+        <a href="{{ url_for('index') }}" class="logo"><span class="logo-icon">🔐</span><span class="logo-text">HealthCrypto</span></a>
+    </nav>
+    
     <div class="container">
         <a href="{{ url_for('index') }}" class="back-link">← Back to Dashboard</a>
         
-        <header>
-            <h1>📊 Verify Audit Log</h1>
-        </header>
+        <div class="page-header">
+            <div class="header-icon">📊</div>
+            <h1>Verify Audit Log</h1>
+            <p>Verify the integrity of hash-chained audit logs for compliance and security auditing</p>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         
         <div class="card">
-            <div class="info">
-                <strong>Hash-Chained Audit Logging:</strong><br>
-                The audit log uses cryptographic hash chains to ensure integrity.
-                Each entry contains a hash of the previous entry, making any 
-                tampering detectable.
+            <h3 class="card-title"><span>🔗</span> Hash Chain Verification</h3>
+            <p>Our audit system uses cryptographic hash chaining to ensure tamper-proof logging. Each log entry contains a hash of the previous entry, creating an immutable chain.</p>
+            <div class="features-grid">
+                <div class="feature-item"><span class="feature-icon">🔗</span><span>Hash Chaining</span></div>
+                <div class="feature-item"><span class="feature-icon">🛡️</span><span>Tamper Detection</span></div>
+                <div class="feature-item"><span class="feature-icon">✅</span><span>Integrity Verification</span></div>
+                <div class="feature-item"><span class="feature-icon">📋</span><span>Compliance Ready</span></div>
             </div>
-            
-            <p style="margin-bottom: 20px; color: #aaa;">
-                Verify the integrity of the hash-chained audit log. 
-                Any tampering will be detected.
-            </p>
-            
-            <form method="POST">
-                <button type="submit" class="btn">Verify Audit Log</button>
-            </form>
-            
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                    <div class="output {{ category }}">
-{{ message }}
-                    </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
         </div>
+        
+        <div class="card">
+            <h3 class="card-title"><span>🔍</span> Verify Audit Log Integrity</h3>
+            <form method="POST">
+                <button type="submit" class="btn-audit">🔍 Verify Audit Log</button>
+            </form>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="output-box">
+                    {% for category, message in messages %}
+                        {% if category == 'success' %}{{ message }}{% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
     </div>
 </body>
 </html>
-

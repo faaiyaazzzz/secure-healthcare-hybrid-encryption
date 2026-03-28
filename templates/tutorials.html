@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Tutorials - Secure Healthcare Crypto System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); min-height: 100vh; color: #fff; overflow-y: auto; }
+        .navbar { background: rgba(15, 12, 41, 0.95); backdrop-filter: blur(20px); padding: 15px 40px; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(0, 212, 255, 0.2); display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo-icon { font-size: 2em; }
+        .logo-text { font-size: 1.4em; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #00ff88); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-menu { display: flex; align-items: center; gap: 30px; list-style: none; }
+        .nav-link { color: #aaa; text-decoration: none; font-weight: 500; padding: 10px 15px; border-radius: 8px; transition: all 0.3s ease; }
+        .nav-link:hover, .nav-link.active { color: #00d4ff; background: rgba(0, 212, 255, 0.1); }
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        .page-header { text-align: center; margin-bottom: 40px; }
+        .header-icon { font-size: 4em; display: inline-block; margin-bottom: 20px; }
+        .page-header h1 { font-size: 2.5em; margin-bottom: 15px; background: linear-gradient(90deg, #00d4ff, #ff9f43); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .page-header p { color: #aaa; font-size: 1.1em; max-width: 700px; margin: 0 auto; }
+        .tutorial-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-top: 40px; }
+        .tutorial-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; overflow: hidden; transition: all 0.3s ease; }
+        .tutorial-card:hover { transform: translateY(-8px); border-color: #ff9f43; box-shadow: 0 15px 40px rgba(255, 159, 67, 0.2); }
+        .video-container { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .tutorial-content { padding: 25px; }
+        .tutorial-tag { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75em; font-weight: bold; background: rgba(255, 159, 67, 0.1); color: #ff9f43; border: 1px solid rgba(255, 159, 67, 0.3); margin-bottom: 15px; text-transform: uppercase; }
+        .tutorial-card h3 { font-size: 1.3em; color: #fff; margin-bottom: 10px; }
+        .tutorial-card p { color: #aaa; font-size: 0.9em; line-height: 1.6; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: #aaa; text-decoration: none; padding: 10px 20px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; margin-bottom: 30px; }
+        .back-link:hover { color: #ff9f43; background: rgba(255, 159, 67, 0.1); }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <ul class="nav-menu">
+            <li><a href="{{ url_for('index') }}" class="nav-link">🏠 Home</a></li>
+            <li><a href="{{ url_for('help_page') }}" class="nav-link">📖 Help</a></li>
+            <li><a href="{{ url_for('logout') }}" class="nav-link" style="color: #ff6b6b;">Logout</a></li>
+        </ul>
+        <a href="{{ url_for('index') }}" class="logo"><span class="logo-icon">🔐</span><span class="logo-text">HealthCrypto</span></a>
+    </nav>
+    
+    <div class="container">
+        <a href="{{ url_for('index') }}" class="back-link">← Back to Dashboard</a>
+        
+        <div class="page-header">
+            <span class="header-icon">🎥</span>
+            <h1>Video Tutorials</h1>
+            <p>Step-by-step video guides to help you master the Secure Healthcare Crypto System</p>
+        </div>
+        
+        <div class="tutorial-grid">
+            <!-- Tutorial 1 -->
+            <div class="tutorial-card">
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/j-vK8I-E8M4" title="Hybrid Encryption" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <div class="tutorial-content">
+                    <span class="tutorial-tag">Getting Started</span>
+                    <h3>Hybrid RSA-AES Overview</h3>
+                    <p>Understanding the core hybrid encryption architecture used to secure healthcare records in this system.</p>
+                </div>
+            </div>
+            
+            <!-- Tutorial 2 -->
+            <div class="tutorial-card">
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/4_6v0B7W0p0" title="Secure Email" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <div class="tutorial-content">
+                    <span class="tutorial-tag">Encryption</span>
+                    <h3>Securing Medical Images</h3>
+                    <p>Learn how pixel data is encrypted using AES-256 and wrapped with RSA-2048 for secure sharing.</p>
+                </div>
+            </div>
+            
+            <!-- Tutorial 3 -->
+            <div class="tutorial-card">
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/L0hL6W-7vI0" title="Digital Signatures" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <div class="tutorial-content">
+                    <span class="tutorial-tag">Communication</span>
+                    <h3>Digital Signatures & Integrity</h3>
+                    <p>How to verify that received healthcare data has not been tampered with during transmission.</p>
+                </div>
+            </div>
+            
+            <!-- Tutorial 4 -->
+            <div class="tutorial-card">
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/_q9G5F1y3-Q" title="Audit Logs" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <div class="tutorial-content">
+                    <span class="tutorial-tag">Administration</span>
+                    <h3>Audit Log & Compliance</h3>
+                    <p>Master the administration of hash-chained audit logs to ensure HIPAA compliance and data accountability.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

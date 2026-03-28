@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prescriptions - Healthcare Crypto System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); min-height: 100vh; color: #fff; }
+        .navbar { background: rgba(15, 12, 41, 0.95); backdrop-filter: blur(20px); padding: 15px 40px; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(0, 212, 255, 0.2); display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo-icon { font-size: 2em; }
+        .logo-text { font-size: 1.4em; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #00ff88); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px; }
+        .page-header { margin-bottom: 30px; text-align: center; }
+        .page-title { font-size: 2.5em; background: linear-gradient(90deg, #00d4ff, #00ff88); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+        .card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 30px; margin-bottom: 30px; }
+        .card-title { font-size: 1.5em; color: #00d4ff; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .placeholder-content { text-align: center; padding: 50px; color: #aaa; border: 2px dashed rgba(255, 255, 255, 0.1); border-radius: 15px; }
+        .btn-back { display: inline-block; padding: 10px 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; border-radius: 8px; text-decoration: none; transition: all 0.3s ease; }
+        .btn-back:hover { background: rgba(0, 212, 255, 0.1); border-color: #00d4ff; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('logout') }}" style="color: #ff6b6b; text-decoration: none; font-weight: 600;">Logout</a>
+        <a href="{{ url_for('index') }}" class="logo">
+            <span class="logo-icon">🔐</span>
+            <span class="logo-text">HealthCrypto</span>
+        </a>
+    </nav>
+    
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}" style="padding: 15px; border-radius: 10px; margin-bottom: 20px; background: rgba(0, 255, 136, 0.2); border: 1px solid #00ff88; color: #00ff88;">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="page-header">
+            <h1 class="page-title">💊 Prescription Management</h1>
+            <p style="color: #aaa;">Issue and manage digital prescriptions securely</p>
+        </div>
+        
+        <div class="card">
+            <h2 class="card-title">✍️ Issue New Prescription</h2>
+            <form method="POST" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; color: #00d4ff;">Patient ID</label>
+                    <input type="text" name="patient_id" placeholder="P-1001" required style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff;">
+                </div>
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; color: #00d4ff;">Patient Name</label>
+                    <input type="text" name="patient_name" required style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff;">
+                </div>
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; color: #00d4ff;">Medication</label>
+                    <input type="text" name="medication" required style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff;">
+                </div>
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; color: #00d4ff;">Dosage</label>
+                    <input type="text" name="dosage" placeholder="e.g. 500mg" style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff;">
+                </div>
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; color: #00d4ff;">Instructions</label>
+                    <input type="text" name="instructions" placeholder="e.g. Twice daily after meals" style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff;">
+                </div>
+                <div style="grid-column: span 2;">
+                    <button type="submit" style="width: 100%; padding: 15px; background: linear-gradient(90deg, #00d4ff, #00ff88); color: #1a1a2e; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;">Issue Encrypted Prescription</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">📝 Active Prescriptions</h2>
+            {% if prescriptions %}
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left;">
+                                <th style="padding: 12px; color: #00ff88;">Patient</th>
+                                <th style="padding: 12px; color: #00ff88;">Medication</th>
+                                <th style="padding: 12px; color: #00ff88;">Dosage</th>
+                                <th style="padding: 12px; color: #00ff88;">Doctor</th>
+                                <th style="padding: 12px; color: #00ff88;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in prescriptions %}
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 12px;">{{ p.patient_name }}</td>
+                                <td style="padding: 12px;">{{ p.medication }}</td>
+                                <td style="padding: 12px;">{{ p.dosage }}</td>
+                                <td style="padding: 12px;">{{ p.doctor }}</td>
+                                <td style="padding: 12px;"><span style="background: rgba(0, 255, 136, 0.1); color: #00ff88; padding: 4px 8px; border-radius: 4px; font-size: 0.8em;">Verified</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="placeholder-content">
+                    <span style="font-size: 3em; display: block; margin-bottom: 15px;">📄</span>
+                    <p>No prescriptions found in the encrypted database.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <a href="{{ url_for('index') }}" class="btn-back">← Back to Dashboard</a>
+    </div>
+</body>
+</html>

@@ -166,5 +166,69 @@
     "message": "\ud83d\udcdd I've received your message. Our support team will get back to you shortly. For urgent issues, call +1 (555) 911-HELP. Is there something specific I can help with?",
     "timestamp": "2026-02-20 14:26:56",
     "is_support": true
+  },
+  {
+    "id": 22,
+    "user": "doctor",
+    "role": "doctor",
+    "message": "How to decrypt files?",
+    "timestamp": "2026-03-23 15:55:21",
+    "is_support": false
+  },
+  {
+    "id": 23,
+    "user": "Support Bot",
+    "role": "support",
+    "message": "\ud83d\udd13 For decryption: Visit the Decrypt page, enter your role (doctor/nurse), and provide the correct decryption key. Contact admin if you need key reset.",
+    "timestamp": "2026-03-23 15:55:21",
+    "is_support": true
+  },
+  {
+    "id": 24,
+    "user": "doctor",
+    "role": "doctor",
+    "message": "Check medical reports",
+    "timestamp": "2026-03-23 15:55:29",
+    "is_support": false
+  },
+  {
+    "id": 25,
+    "user": "Support Bot",
+    "role": "support",
+    "message": "\ud83c\udfe5 DICOM files are medical images. Use the DICOM handler to sign and verify medical images for authenticity.",
+    "timestamp": "2026-03-23 15:55:29",
+    "is_support": true
+  },
+  {
+    "id": 26,
+    "user": "doctor",
+    "role": "doctor",
+    "message": "hi",
+    "timestamp": "2026-03-23 15:55:48",
+    "is_support": false
+  },
+  {
+    "id": 27,
+    "user": "Support Bot",
+    "role": "support",
+    "message": "\ud83d\udc4b Hello! I'm your Healthcare Crypto Assistant. I can help with clinical tools (Prescriptions, Reports, Appointments) or security features (Encryption, Secure Email). How can I assist you?",
+    "timestamp": "2026-03-23 15:55:48",
+    "is_support": true
+  },
+  {
+    "id": 28,
+    "user": "doctor",
+    "role": "doctor",
+    "message": "faiyaz",
+    "timestamp": "2026-03-23 15:56:03",
+    "is_support": false
+  },
+  {
+    "id": 29,
+    "user": "Support Bot",
+    "role": "support",
+    "message": "\ud83d\udcdd I've received your clinical support request. Our team will review this and respond shortly. For urgent medical technical issues, call +1 (555) 911-HELP.",
+    "timestamp": "2026-03-23 15:56:03",
+    "is_support": true
   }
 ]

@@ -478,11 +478,6 @@
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo">
-            <span class="logo-icon">🔐</span>
-            <span class="logo-text">HealthCrypto</span>
-        </div>
-        
         <ul class="nav-menu">
             <li><a href="{{ url_for('index') }}" class="nav-link">🏠 Home</a></li>
             <li><a href="{{ url_for('lab_results') }}" class="nav-link active">🧪 Lab Results</a></li>
@@ -491,9 +486,15 @@
             <li><a href="{{ url_for('send_email') }}" class="nav-link">📧 Email</a></li>
         </ul>
         
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <span class="hospital-badge">🏥 {{ session.get('hospital', {}).get('name', 'No Hospital') }}</span>
-            <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span class="hospital-badge">🏥 {{ session.get('hospital', {}).get('name', 'No Hospital') }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+            </div>
+            <div class="logo">
+                <span class="logo-icon">🔐</span>
+                <span class="logo-text">HealthCrypto</span>
+            </div>
         </div>
     </nav>
     
