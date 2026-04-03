@@ -1,92 +1,134 @@
-# 🔐 Secure Healthcare Crypto System
+# 🔐 Advanced Secure Healthcare Crypto System
 
-### **Hybrid RSA–AES Encryption | Role-Based Access Control | Real-Time Audit Monitoring**
+### **Enterprise-Grade Hybrid RSA–AES | Cryptographic RBAC | Hash-Chained Audit Logs**
 
-A professional, enterprise-grade healthcare data protection platform that implements a hybrid cryptographic model to ensure the confidentiality, integrity, and availability of sensitive medical records.
-
----
-
-## 🚀 **Overview**
-
-This project demonstrates a production-ready security architecture for healthcare systems. It combines **AES-256-GCM** (Authenticated Encryption) for data confidentiality with **RSA-2048** (Envelope Encryption) for secure key distribution and digital identity management.
-
-The system features a modern, role-based web interface designed for **Doctors, Nurses, Administrators, and Patients**, each with tailored dashboards and cryptographic permissions.
+[![Security: RSA-2048](https://img.shields.io/badge/Security-RSA--2048-blueviolet)](https://en.wikipedia.org/wiki/RSA_(cryptosystem))
+[![Encryption: AES-256-GCM](https://img.shields.io/badge/Encryption-AES--256--GCM-blue)](https://en.wikipedia.org/wiki/Galois/Counter_Mode)
+[![Integrity: SHA-256](https://img.shields.io/badge/Integrity-SHA--256-green)](https://en.wikipedia.org/wiki/SHA-2)
 
 ---
 
-## ✨ **Key Features**
+## 🏛️ **System Architecture**
 
-### **1. Advanced Cryptography**
-- **Hybrid Encryption**: Combines the speed of AES-256 with the secure key exchange of RSA-2048.
-- **Envelope Encryption**: AES session keys are encrypted per recipient using their RSA public keys.
-- **Authenticated Encryption (GCM)**: Ensures that data has not been tampered with during transit or storage.
-- **Medical Image Security**: Specialized DICOM and image encryption/decryption modules.
+The system employs a multi-layered security architecture designed to protect sensitive Electronic Health Records (EHR) through its entire lifecycle: **In-Transit, In-Use, and At-Rest**.
 
-### **2. Role-Based Access Control (RBAC)**
-- **Granular Permissions**: Different roles (Doctor, Nurse, Admin, Patient) have specific access to services.
-- **Cryptographic Enforcement**: Access to sensitive data is enforced through per-user RSA key pairs.
+### **High-Level Flow Diagram**
 
-### **3. Admin & Security Monitoring**
-- **Admin Activity Dashboard**: Real-time, system-wide monitoring of all user logins, cryptographic operations, and security events.
-- **Hash-Chained Audit Logging**: Every system action is logged in an immutable, hash-linked chain to prevent log tampering.
-- **Integrity Verification**: Built-in tools to verify the integrity of audit logs and detect unauthorized modifications.
+```mermaid
+graph TD
+    subgraph "Data Input"
+        A[Sensitive Healthcare Data] --> B{Role Check}
+    end
 
-### **4. Modern User Experience**
-- **Professional Web UI**: A sleek, dark-themed interface built with glassmorphism and responsive design.
-- **Role-Specific Dashboards**: Tailored experiences for clinical staff and patients.
-- **Security Enhancements**: Interactive password visibility toggles and real-time system health diagnostics.
+    subgraph "Hybrid Encryption Engine"
+        B -- Authorized --> C[Generate AES-256 Session Key]
+        C --> D[AES-GCM Encryption]
+        D --> E[Ciphertext + Tag + Nonce]
+        F[Recipient RSA Public Key] --> G[RSA-2048 Key Wrap]
+        C --> G
+        G --> H[Encrypted Session Key /Envelope/]
+    end
+
+    subgraph "Secure Storage & Audit"
+        E --> I[Secure Payload Store]
+        H --> I
+        J[Event Data] --> K[Hash-Chained Audit Logger]
+        K --> L[audit.log]
+    end
+
+    subgraph "Decryption & Access"
+        I --> M{RBAC Verification}
+        M -- Valid Private Key --> N[Unwrap AES Key]
+        N --> O[AES-GCM Decryption]
+        O --> P[Original Healthcare Data]
+    end
+```
 
 ---
 
-## 🛠️ **Tech Stack**
+## 🧠 **Core Algorithms**
 
-- **Backend**: Python 3.x, Flask (Web Framework)
-- **Cryptography**: `cryptography` library (AES-256-GCM, RSA-2048, SHA-256)
-- **Frontend**: HTML5, CSS3 (Modern Grid/Flexbox, Glassmorphism), JavaScript (Vanilla)
-- **Data Handling**: JSON-based secure payload storage and DICOM medical image processing.
+### **1. Hybrid RSA-AES Encryption Flow**
+The system uses **Envelope Encryption** to combine the efficiency of symmetric encryption with the security of asymmetric key exchange.
+
+**Encryption Procedure:**
+1.  **Symmetric Key Generation**: A cryptographically secure 256-bit random key ($K_{aes}$) is generated for every operation.
+2.  **Data Encryption**: The plaintext ($P$) is encrypted using AES-256 in Galois/Counter Mode (GCM).
+    - $C, T = E_{aes}(K_{aes}, IV, P)$
+    - Where $C$ is Ciphertext, $T$ is the Authentication Tag, and $IV$ is the Initialization Vector.
+3.  **Asymmetric Key Wrapping**: The session key $K_{aes}$ is encrypted using the recipient's RSA-2048 Public Key ($PK_{rsa}$).
+    - $E_{key} = E_{rsa}(PK_{rsa}, K_{aes})$
+4.  **Packaging**: The final payload contains $[E_{key}, C, T, IV]$.
+
+### **2. Hash-Chained Audit Algorithm**
+To ensure log integrity, every entry is cryptographically linked to the previous one, creating an immutable chain.
+
+**Logging Formula:**
+- $H_n = \text{SHA-256}(Timestamp | Event | Message | H_{n-1})$
+- Where $H_n$ is the hash of the current log entry and $H_{n-1}$ is the hash of the preceding entry.
+- **Verification**: If any single bit in any log entry is changed, the entire chain of hashes from that point forward will fail validation.
 
 ---
 
-## 🔑 **Default Credentials**
+## 🔐 **Cryptographic Role-Based Access Control (RBAC)**
 
-| Role | Username | Password |
+| Role | Access Level | Cryptographic Capability |
 | :--- | :--- | :--- |
-| **Administrator** | `admin` | `admin123` |
-| **Doctor** | `doctor` | `doctor123` |
-| **Nurse** | `nurse` | `nurse123` |
-| **Patient** | `patient` | `patient123` |
+| **Admin** | System-Wide | Full Audit Verification, Key Management, System Diagnostics |
+| **Doctor** | Clinical-High | EHR Encryption/Decryption, DICOM Image Processing |
+| **Nurse** | Clinical-Mid | EHR Decryption, Record Management |
+| **Patient** | User-Specific | Personal Data Encryption, Secure Communication |
 
 ---
 
-## 📂 **Project Structure**
+## 📊 **Security Dashboard Metrics**
 
-- `app.py`: Main Flask application and routing logic.
-- `audit_logger.py`: Implements hash-chained logging and integrity checks.
-- `key_manager.py`: Handles RSA/AES key generation, storage, and rotation.
-- `rbac_crypto.py`: Enforces role-based cryptographic access.
-- `templates/`: Modern HTML templates for all dashboards and services.
-- `uploads/`: Secure storage for encrypted medical images and data payloads.
+The **Admin Dashboard** provides real-time visualization of the system's security posture:
+- **Integrity Score**: Real-time status of the hash-chained audit log.
+- **Encryption Throughput**: Number of RSA/AES operations processed.
+- **Access Heatmap**: Distribution of logins across different roles.
+- **Tamper Alerts**: Instant notification if any cryptographic signature fails verification.
 
 ---
 
-## 🚦 **Getting Started**
+## 🛠️ **Installation & Setup**
 
-1. **Install Dependencies**:
+### **Prerequisites**
+- Python 3.8+
+- OpenSSL (for key generation)
+
+### **Deployment**
+1. **Clone & Install**:
    ```bash
-   pip install flask cryptography pillow pydicom
+   git clone https://github.com/faaiyaazzzz/secure-healthcare-hybrid-encryption.git
+   cd secure-healthcare-hybrid-encryption
+   pip install -r requirements.txt
    ```
 
-2. **Run the Application**:
+2. **Initialize Keys**:
+   The system will automatically generate the root RSA keys on first run.
+
+3. **Start the Engine**:
    ```bash
    python app.py
    ```
 
-3. **Access the Portal**:
-   Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
+---
+
+## 🛡️ **Threat Model Mitigation**
+
+| Threat | Mitigation Strategy |
+| :--- | :--- |
+| **Man-in-the-Middle (MitM)** | RSA Public Key Exchange & AES-GCM Authentication Tags |
+| **Log Tampering** | SHA-256 Hash-Chaining (Blockchain-inspired integrity) |
+| **Unauthorized Access** | Cryptographically enforced RBAC via Private Key ownership |
+| **Brute Force** | High-entropy 256-bit AES keys and 2048-bit RSA modulus |
 
 ---
 
-## 🛡️ **Security Principles**
-- **Confidentiality**: Only authorized recipients can decrypt data using their private RSA keys.
-- **Integrity**: Any unauthorized change to encrypted data or audit logs is immediately detected.
-- **Accountability**: All actions are logged and attributable to a specific user and timestamp.
+## 📜 **License**
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+**Built with ❤️ for Healthcare Security by [faaiyaazzzz]**
