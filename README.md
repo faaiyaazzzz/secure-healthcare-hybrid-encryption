@@ -1,191 +1,92 @@
-🔐 Secure Healthcare Data Protection System
+# 🔐 Secure Healthcare Crypto System
 
-Hybrid RSA–AES Encryption with Secure Email, RBAC & Tamper Detection
+### **Hybrid RSA–AES Encryption | Role-Based Access Control | Real-Time Audit Monitoring**
 
-📌 Overview
+A professional, enterprise-grade healthcare data protection platform that implements a hybrid cryptographic model to ensure the confidentiality, integrity, and availability of sensitive medical records.
 
-This project implements a production-inspired secure healthcare data protection system using a hybrid cryptographic model.
-It demonstrates how sensitive healthcare records can be encrypted, securely shared via email, access-controlled, audited, and protected against tampering.
+---
 
-The system follows real-world security design principles used in enterprise systems (PGP / S-MIME style envelope encryption).
+## 🚀 **Overview**
 
-🧠 Core Security Model (Hybrid Encryption)
+This project demonstrates a production-ready security architecture for healthcare systems. It combines **AES-256-GCM** (Authenticated Encryption) for data confidentiality with **RSA-2048** (Envelope Encryption) for secure key distribution and digital identity management.
 
-AES-256-GCM
+The system features a modern, role-based web interface designed for **Doctors, Nurses, Administrators, and Patients**, each with tailored dashboards and cryptographic permissions.
 
-Encrypts healthcare data
+---
 
-Provides confidentiality and integrity (authenticated encryption)
+## ✨ **Key Features**
 
-RSA-2048 (Envelope Encryption)
+### **1. Advanced Cryptography**
+- **Hybrid Encryption**: Combines the speed of AES-256 with the secure key exchange of RSA-2048.
+- **Envelope Encryption**: AES session keys are encrypted per recipient using their RSA public keys.
+- **Authenticated Encryption (GCM)**: Ensures that data has not been tampered with during transit or storage.
+- **Medical Image Security**: Specialized DICOM and image encryption/decryption modules.
 
-Encrypts the AES session key per recipient
+### **2. Role-Based Access Control (RBAC)**
+- **Granular Permissions**: Different roles (Doctor, Nurse, Admin, Patient) have specific access to services.
+- **Cryptographic Enforcement**: Access to sensitive data is enforced through per-user RSA key pairs.
 
-Enables secure key distribution via email
+### **3. Admin & Security Monitoring**
+- **Admin Activity Dashboard**: Real-time, system-wide monitoring of all user logins, cryptographic operations, and security events.
+- **Hash-Chained Audit Logging**: Every system action is logged in an immutable, hash-linked chain to prevent log tampering.
+- **Integrity Verification**: Built-in tools to verify the integrity of audit logs and detect unauthorized modifications.
 
-Digital Identity = RSA Key Pair
+### **4. Modern User Experience**
+- **Professional Web UI**: A sleek, dark-themed interface built with glassmorphism and responsive design.
+- **Role-Specific Dashboards**: Tailored experiences for clinical staff and patients.
+- **Security Enhancements**: Interactive password visibility toggles and real-time system health diagnostics.
 
-Each recipient has a public/private key pair
+---
 
-Email is treated as a transport channel, not a trust mechanism
+## 🛠️ **Tech Stack**
 
-🔁 Key Lifecycle & Rotation
+- **Backend**: Python 3.x, Flask (Web Framework)
+- **Cryptography**: `cryptography` library (AES-256-GCM, RSA-2048, SHA-256)
+- **Frontend**: HTML5, CSS3 (Modern Grid/Flexbox, Glassmorphism), JavaScript (Vanilla)
+- **Data Handling**: JSON-based secure payload storage and DICOM medical image processing.
 
-AES keys:
-✔ Automatically generated per encryption (session keys)
-✔ Never reused
+---
 
-RSA keys:
-✔ Long-term identity keys
-✔ Rotated manually (by design, like real secure email systems)
+## 🔑 **Default Credentials**
 
-🔐 Features Implemented
+| Role | Username | Password |
+| :--- | :--- | :--- |
+| **Administrator** | `admin` | `admin123` |
+| **Doctor** | `doctor` | `doctor123` |
+| **Nurse** | `nurse` | `nurse123` |
+| **Patient** | `patient` | `patient123` |
 
-Hybrid RSA–AES encryption
+---
 
-Authenticated encryption (AES-GCM)
+## 📂 **Project Structure**
 
-Per-recipient public-key envelope encryption
+- `app.py`: Main Flask application and routing logic.
+- `audit_logger.py`: Implements hash-chained logging and integrity checks.
+- `key_manager.py`: Handles RSA/AES key generation, storage, and rotation.
+- `rbac_crypto.py`: Enforces role-based cryptographic access.
+- `templates/`: Modern HTML templates for all dashboards and services.
+- `uploads/`: Secure storage for encrypted medical images and data payloads.
 
-Secure email transmission of encrypted payloads
+---
 
-Cryptographic Role-Based Access Control (RBAC)
+## 🚦 **Getting Started**
 
-Doctor / Nurse / Admin
+1. **Install Dependencies**:
+   ```bash
+   pip install flask cryptography pillow pydicom
+   ```
 
-Hash-chained audit logging
+2. **Run the Application**:
+   ```bash
+   python app.py
+   ```
 
-Audit log integrity verification
+3. **Access the Portal**:
+   Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
 
-Tamper detection (payload & logs)
+---
 
-Separate Blue Team (normal operations) and Red Team (attack simulation) GUIs
-
-Full system reset for repeatable security testing
-
-📂 Project Structure (Final)
-healthcare_crypto_project/
-│
-├── main.py                     # CLI entry point
-├── main_gui.py                 # Blue team GUI (normal operations)
-├── tamper_gui.py               # Red team GUI (attack simulation)
-│
-├── hybrid_encrypt.py           # Encryption workflow
-├── hybrid_decrypt.py           # Decryption + RBAC
-├── aes_gcm_utils.py            # AES-GCM utilities
-├── rsa_utils.py                # RSA key handling
-├── rsa_envelope.py             # Envelope encryption (AES key wrapping)
-│
-├── secure_email_sender.py      # Encrypted email sender
-├── secure_email_receiver.py    # Email payload verification & decryption
-│
-├── recipient_keygen.py         # RSA key generation per recipient
-├── rbac_crypto.py              # Cryptographic RBAC enforcement
-│
-├── audit.log                   # Hash-chained audit log
-├── audit_logger.py             # Audit logging
-├── verify_audit_log.py         # Audit integrity verification
-│
-├── secure_payload.json         # Encrypted email payload (generated)
-├── recipient_keys/             # RSA keys per recipient
-│
-└── README.md
-
-▶️ How to Run (CLI)
-Encrypt data
-python main.py encrypt
-
-Decrypt data (RBAC enforced)
-python main.py decrypt
-
-Send encrypted email
-python main.py encrypt-email recipient@gmail.com
-
-Verify audit log
-python main.py verify
-
-▶️ Email Receiver (Integrity + RBAC)
-python secure_email_receiver.py secure_payload.json recipient@gmail.com doctor
-python secure_email_receiver.py secure_payload.json recipient@gmail.com nurse
-python secure_email_receiver.py secure_payload.json recipient@gmail.com admin
-
-
-Each role receives only authorized fields, enforced cryptographically.
-
-🖥️ GUIs
-🔵 Main GUI (Blue Team)
-python main_gui.py
-
-
-Used for:
-
-Encryption / Decryption
-
-Secure email sending
-
-RBAC verification
-
-Audit verification
-
-🔴 Tampering GUI (Red Team)
-python tamper_gui.py
-
-
-Used for:
-
-Payload tampering (AES-GCM MAC failure)
-
-Audit log tampering (hash chain break)
-
-Full system reset for clean re-tests
-
-🧪 Security Testing & Tamper Detection
-Payload Tampering
-
-Modifies encrypted ciphertext
-
-Decryption fails with:
-
-MAC check failed
-
-Audit Log Tampering
-
-Modifies audit log post-event
-
-Verification fails with:
-
-[FAIL] Log tampering detected
-
-
-These failures prove integrity enforcement, not system errors.
-
-🔁 System Reset (Recommended After Each Demo)
-
-The tampering GUI includes a Reset System State button that removes:
-
-secure_payload.json
-
-audit.log
-
-This ensures repeatable and clean security testing.
-
-🧠 Design Decisions (Why This Is Correct)
-
-Email is treated as untrusted transport
-
-Security relies on cryptography, not trust
-
-AES keys rotate automatically
-
-RSA keys represent identity
-
-No silent key generation or insecure defaults
-
-Attack simulation is separated from normal operations
-
-This mirrors real enterprise security systems.
-
-🎯 Conclusion
-
-This project demonstrates a complete, verifiable, and attack-resilient healthcare data security system.
-It goes beyond basic encryption to include secure key exchange, access control, auditing, tamper detection, and adversarial testing, all backed by real cryptographic guarantees.
+## 🛡️ **Security Principles**
+- **Confidentiality**: Only authorized recipients can decrypt data using their private RSA keys.
+- **Integrity**: Any unauthorized change to encrypted data or audit logs is immediately detected.
+- **Accountability**: All actions are logged and attributable to a specific user and timestamp.
