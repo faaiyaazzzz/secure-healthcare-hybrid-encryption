@@ -6,18 +6,23 @@ Generates required RSA keys for encryption/decryption
 import os
 import json
 from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP
-from Crypto.Random import get_random_bytes
 
-# Directories
-KEY_DIR = "keys"
-RECIPIENT_KEYS_DIR = "recipient_keys"
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+KEY_DIR = os.path.join(PROJECT_DIR, "keys")
+RECIPIENT_KEYS_DIR = os.path.join(PROJECT_DIR, "recipient_keys")
 
 # Default recipients with their emails
 RECIPIENTS = [
     "chintu01032005@gmail.com",
     "doctor@example.com",
-    "test@example.com"
+    "doctor2@example.com",
+    "test@example.com",
+    "faiyazmansuri303@gmail.com",
+    "aditya10thf@gmail.com",
+    "patient@example.com",
+    "faiyazmansuri2003@gmail.com",
+    "pandajod8@gmail.com",
+    "faiyazmansuri007@gmail.com"
 ]
 
 
@@ -25,18 +30,21 @@ def generate_system_keys():
     """Generate system RSA key pair for AES key wrapping"""
     os.makedirs(KEY_DIR, exist_ok=True)
     
+    priv_path = os.path.join(KEY_DIR, "private.pem")
+    pub_path = os.path.join(KEY_DIR, "public.pem")
+    
     # Check if keys already exist
-    if os.path.exists(f"{KEY_DIR}/private.pem") and os.path.exists(f"{KEY_DIR}/public.pem"):
-        print(f"[INFO] System keys already exist in {KEY_DIR}")
+    if os.path.exists(priv_path) and os.path.exists(pub_path):
+        print(f"[INFO] System keys exist in {KEY_DIR}")
         return
     
     print("[INFO] Generating system RSA-2048 keys...")
     key = RSA.generate(2048)
     
-    with open(f"{KEY_DIR}/private.pem", "wb") as f:
+    with open(priv_path, "wb") as f:
         f.write(key.export_key())
     
-    with open(f"{KEY_DIR}/public.pem", "wb") as f:
+    with open(pub_path, "wb") as f:
         f.write(key.publickey().export_key())
     
     print(f"[OK] System keys generated in {KEY_DIR}")
@@ -47,21 +55,21 @@ def generate_recipient_keys():
     os.makedirs(RECIPIENT_KEYS_DIR, exist_ok=True)
     
     for email in RECIPIENTS:
-        safe_email = email.replace("@", "_").replace(".", "_")
-        priv_path = f"{RECIPIENT_KEYS_DIR}/{safe_email}_private.pem"
-        pub_path = f"{RECIPIENT_KEYS_DIR}/{safe_email}_public.pem"
+        safe_email = email.split("@")[0]
+        p_priv = os.path.join(RECIPIENT_KEYS_DIR, f"{safe_email}_private.pem")
+        p_pub = os.path.join(RECIPIENT_KEYS_DIR, f"{safe_email}_public.pem")
         
-        if os.path.exists(priv_path) and os.path.exists(pub_path):
-            print(f"[INFO] Keys already exist for {email}")
+        if os.path.exists(p_priv) and os.path.exists(p_pub):
+            print(f"[INFO] Keys exist for {email}")
             continue
         
         print(f"[INFO] Generating RSA-2048 keys for {email}...")
         key = RSA.generate(2048)
         
-        with open(priv_path, "wb") as f:
+        with open(p_priv, "wb") as f:
             f.write(key.export_key())
         
-        with open(pub_path, "wb") as f:
+        with open(p_pub, "wb") as f:
             f.write(key.publickey().export_key())
         
         print(f"[OK] Keys generated for {email}")
@@ -70,17 +78,17 @@ def generate_recipient_keys():
 def initialize_aes_keys():
     """Initialize AES keys storage"""
     os.makedirs(KEY_DIR, exist_ok=True)
-    aes_keys_file = f"{KEY_DIR}/aes_keys.json"
+    aes_keys_file = os.path.join(KEY_DIR, "aes_keys.json")
     
     if os.path.exists(aes_keys_file):
-        print(f"[INFO] AES keys already initialized")
+        print("[INFO] AES keys already initialized")
         return
     
     # Create empty AES keys file
     with open(aes_keys_file, "w") as f:
         json.dump([], f)
     
-    print(f"[OK] AES keys storage initialized")
+    print("[OK] AES keys storage initialized")
 
 
 def main():

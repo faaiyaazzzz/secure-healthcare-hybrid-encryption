@@ -1,256 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - Secure Healthcare Crypto System</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            min-height: 100vh;
-            color: #fff;
-            overflow-y: auto;
-        }
-        .navbar {
-            background: rgba(15, 12, 41, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 15px 40px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .logo-icon { font-size: 2em; }
-        .logo-text {
-            font-size: 1.4em;
-            font-weight: bold;
-            background: linear-gradient(90deg, #00d4ff, #00ff88);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .nav-menu {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            list-style: none;
-        }
-        .nav-link {
-            color: #aaa;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 10px 15px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .nav-link:hover, .nav-link.active {
-            color: #00d4ff;
-            background: rgba(0, 212, 255, 0.1);
-        }
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: rgba(0, 212, 255, 0.1);
-            padding: 8px 15px;
-            border-radius: 30px;
-            border: 1px solid rgba(0, 212, 255, 0.3);
-        }
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #00d4ff, #00ff88);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #1a1a2e;
-        }
-        .btn-logout {
-            padding: 10px 20px;
-            background: rgba(255, 107, 107, 0.2);
-            border: 1px solid #ff6b6b;
-            color: #ff6b6b;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-        .profile-header {
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 255, 136, 0.1));
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .profile-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #00d4ff, #00ff88);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3em;
-            margin: 0 auto 20px;
-            border: 4px solid rgba(0, 212, 255, 0.3);
-        }
-        .profile-header h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-        .role-badge {
-            display: inline-block;
-            background: linear-gradient(90deg, #00d4ff, #00ff88);
-            color: #1a1a2e;
-            padding: 5px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9em;
-            text-transform: uppercase;
-        }
-        .info-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-        .info-card h2 {
-            color: #00d4ff;
-            font-size: 1.3em;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .info-row:last-child { border-bottom: none; }
-        .info-label { color: #aaa; }
-        .info-value { color: #fff; font-weight: 500; }
-        .btn {
-            display: inline-block;
-            padding: 12px 25px;
-            background: linear-gradient(90deg, #00d4ff, #00ff88);
-            color: #1a1a2e;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
-        }
-        .flash-messages { margin-bottom: 20px; }
-        .flash {
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-        .flash.success {
-            background: rgba(0, 255, 136, 0.2);
-            border: 1px solid #00ff88;
-            color: #00ff88;
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar">
-        <div class="logo">
-            <span class="logo-icon">🔐</span>
-            <span class="logo-text">HealthCrypto</span>
-        </div>
-        <ul class="nav-menu">
-            <li><a href="{{ url_for('index') }}" class="nav-link">🏠 Home</a></li>
-            <li><a href="{{ url_for('profile') }}" class="nav-link active">👤 Profile</a></li>
-            <li><a href="{{ url_for('settings') }}" class="nav-link">⚙️ Settings</a></li>
-            <li><a href="{{ url_for('help_page') }}" class="nav-link">❓ Help</a></li>
-        </ul>
-        <div class="user-profile">
-            <div class="user-avatar">{{ user.username|upper }}</div>
-            <span>{{ user.username }}</span>
-            <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
-        </div>
-    </nav>
-    
-    <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="flash {{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-        
-        <div class="profile-header">
-            <div class="profile-avatar">👤</div>
-            <h1>{{ user.username }}</h1>
-            <span class="role-badge">{{ user.role }}</span>
-        </div>
-        
-        <div class="info-card">
-            <h2>👤 Personal Information</h2>
-            <div class="info-row">
-                <span class="info-label">Username</span>
-                <span class="info-value">{{ user.username }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Email</span>
-                <span class="info-value">{{ user.email }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Role</span>
-                <span class="info-value">{{ user.role|title }}</span>
-            </div>
-            {% if user.hospital %}
-            <div class="info-row">
-                <span class="info-label">Hospital</span>
-                <span class="info-value">{{ user.hospital.name }}</span>
-            </div>
-            {% endif %}
-        </div>
-        
-        <div class="info-card">
-            <h2>🔐 Account Security</h2>
-            <div class="info-row">
-                <span class="info-label">Password</span>
-                <span class="info-value">•••••••• <a href="{{ url_for('security') }}" style="color: #00d4ff;">Change</a></span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Two-Factor Auth</span>
-                <span class="info-value">Not Enabled <a href="{{ url_for('security') }}" style="color: #00d4ff;">Enable</a></span>
-            </div>
-        </div>
-        
-        <a href="{{ url_for('settings') }}" class="btn">Edit Profile</a>
+{% extends "base.html" %}
+
+{% block title %}Profile - Secure Healthcare Crypto System{% endblock %}
+{% block topbar_title %}Profile{% endblock %}
+
+{% block content %}
+<div class="profile-banner">
+    <div class="profile-avatar">{{ user.username[:1]|upper }}</div>
+    <div class="profile-info">
+        <h2>{{ user.username|capitalize }}</h2>
+        <span class="role-badge">{{ user.role|upper }}</span>
     </div>
-</body>
-</html>
+</div>
+
+<div class="card">
+    <h3 class="card-title">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Personal Information
+    </h3>
+    <div class="info-row">
+        <span class="info-label">Username</span>
+        <span class="info-value">{{ user.username }}</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Email</span>
+        <span class="info-value">{{ user.email }}</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Role</span>
+        <span class="info-value">{{ user.role|title }}</span>
+    </div>
+    {% if user.hospital %}
+    <div class="info-row">
+        <span class="info-label">Hospital</span>
+        <span class="info-value">{{ user.hospital.name }}</span>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3 class="card-title">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Account Security
+    </h3>
+    <div class="info-row">
+        <span class="info-label">Password</span>
+        <span class="info-value">•••••••• <a href="{{ url_for('security') }}" style="color: var(--primary-light); text-decoration: none;">Change</a></span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Two-Factor Auth</span>
+        <span class="info-value">Not Enabled <a href="{{ url_for('security') }}" style="color: var(--primary-light); text-decoration: none;">Enable</a></span>
+    </div>
+</div>
+
+<a href="{{ url_for('settings') }}" class="btn btn-primary">Edit Profile</a>
+{% endblock %}

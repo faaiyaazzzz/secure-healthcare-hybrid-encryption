@@ -1,148 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings - Secure Healthcare Crypto System</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            min-height: 100vh;
-            color: #fff;
-            overflow-y: auto;
-        }
-        .navbar {
-            background: rgba(15, 12, 41, 0.95);
-            padding: 15px 40px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .logo { display: flex; align-items: center; gap: 12px; }
-        .logo-icon { font-size: 2em; }
-        .logo-text {
-            font-size: 1.4em;
-            font-weight: bold;
-            background: linear-gradient(90deg, #00d4ff, #00ff88);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .nav-menu { display: flex; align-items: center; gap: 30px; list-style: none; }
-        .nav-link {
-            color: #aaa;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 10px 15px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        .nav-link:hover, .nav-link.active { color: #00d4ff; background: rgba(0, 212, 255, 0.1); }
-        .user-profile { display: flex; align-items: center; gap: 15px; }
-        .user-avatar {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: linear-gradient(135deg, #00d4ff, #00ff88);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; color: #1a1a2e;
-        }
-        .btn-logout {
-            padding: 10px 20px;
-            background: rgba(255, 107, 107, 0.2);
-            border: 1px solid #ff6b6b;
-            color: #ff6b6b;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .container { max-width: 700px; margin: 40px auto; padding: 0 20px; }
-        .settings-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-        .settings-card h2 { color: #00d4ff; font-size: 1.3em; margin-bottom: 20px; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; color: #aaa; }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            background: rgba(0, 0, 0, 0.3);
-            color: #fff;
-            font-size: 1em;
-        }
-        .form-group input:focus { outline: none; border-color: #00d4ff; }
-        .btn {
-            padding: 12px 25px;
-            background: linear-gradient(90deg, #00d4ff, #00ff88);
-            color: #1a1a2e;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4); }
-    </style>
-</head>
-<body>
-    <nav class="navbar">
-        <ul class="nav-menu">
-            <li><a href="{{ url_for('index') }}" class="nav-link">🏠 Home</a></li>
-            <li><a href="{{ url_for('profile') }}" class="nav-link">👤 Profile</a></li>
-            <li><a href="{{ url_for('settings') }}" class="nav-link active">⚙️ Settings</a></li>
-            <li><a href="{{ url_for('help_page') }}" class="nav-link">❓ Help</a></li>
-        </ul>
-        <div class="user-profile">
-            <div class="user-avatar">{{ user.username|upper }}</div>
-            <span>{{ user.username }}</span>
-            <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
-        </div>
-        <div class="logo">
-            <span class="logo-icon">🔐</span>
-            <span class="logo-text">HealthCrypto</span>
-        </div>
-    </nav>
-    <div class="container">
-        <h1 style="margin-bottom: 30px;">⚙️ Settings</h1>
-        <form method="POST">
-            <div class="settings-card">
-                <h2>Account Settings</h2>
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" value="{{ user.username }}" disabled>
-                </div>
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" value="{{ user.username }}@healthcrypto.com">
-                </div>
-                <div class="form-group">
-                    <label>Role</label>
-                    <input type="text" value="{{ user.role }}" disabled>
-                </div>
+{% extends "base.html" %}
+
+{% block title %}Settings - Secure Healthcare Crypto System{% endblock %}
+{% block topbar_title %}Settings{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('profile') }}" class="back-link">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to Profile
+</a>
+
+<div class="page-header">
+    <h2>Settings</h2>
+    <p>Manage your account preferences, notification settings, and display options.</p>
+</div>
+
+<form method="POST">
+    <div class="card">
+        <h3 class="card-title">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Account Settings
+        </h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" value="{{ user.username }}" disabled class="form-input" style="opacity: 0.6;">
             </div>
-            <div class="settings-card">
-                <h2>Notification Preferences</h2>
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" checked> Enable email notifications
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" checked> Enable security alerts
-                    </label>
-                </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" value="{{ user.username }}@healthcrypto.com" class="form-input">
             </div>
-            <button type="submit" class="btn">Save Settings</button>
-        </form>
+            <div class="form-group">
+                <label>Role</label>
+                <input type="text" value="{{ user.role }}" disabled class="form-input" style="opacity: 0.6;">
+            </div>
+        </div>
     </div>
-</body>
-</html>
+
+    <div class="card">
+        <h3 class="card-title">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            Notification Preferences
+        </h3>
+        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+            <input type="checkbox" checked id="email-notif" style="width: auto; accent-color: var(--primary);">
+            <label for="email-notif" style="margin: 0; cursor: pointer;">Enable email notifications</label>
+        </div>
+        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+            <input type="checkbox" checked id="security-alerts" style="width: auto; accent-color: var(--primary);">
+            <label for="security-alerts" style="margin: 0; cursor: pointer;">Enable security alerts</label>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Settings</button>
+</form>
+{% endblock %}

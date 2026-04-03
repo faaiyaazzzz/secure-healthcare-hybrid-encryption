@@ -34,6 +34,15 @@ def get_active_key():
     return rotate_key()
 
 
+def get_key_by_id(key_id):
+    """Retrieve a specific key by its ID from the store."""
+    keys = _load_keys()
+    for key in keys:
+        if key["key_id"] == key_id:
+            return bytes.fromhex(key["key"])
+    return None
+
+
 def rotate_key():
     keys = _load_keys()
     now = int(time.time())

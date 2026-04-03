@@ -24,13 +24,14 @@ def decrypt_record(encrypted_record: dict, role: str):
     output = {}
 
     for field in visible:
-        data = encrypted_record[field]
-        plaintext = decrypt_gcm(
-            bytes.fromhex(data["ciphertext"]),
-            key,
-            bytes.fromhex(data["nonce"]),
-            bytes.fromhex(data["tag"])
-        )
-        output[field] = plaintext.decode()
+        if field in encrypted_record:
+            data = encrypted_record[field]
+            plaintext = decrypt_gcm(
+                bytes.fromhex(data["ciphertext"]),
+                key,
+                bytes.fromhex(data["nonce"]),
+                bytes.fromhex(data["tag"])
+            )
+            output[field] = plaintext.decode()
 
     return output

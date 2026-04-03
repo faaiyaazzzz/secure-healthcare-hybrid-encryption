@@ -1,102 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Reports - Healthcare Crypto System</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); min-height: 100vh; color: #fff; }
-        .navbar { background: rgba(15, 12, 41, 0.95); backdrop-filter: blur(20px); padding: 15px 40px; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(0, 212, 255, 0.2); display: flex; justify-content: space-between; align-items: center; }
-        .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        .logo-icon { font-size: 2em; }
-        .logo-text { font-size: 1.4em; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #00ff88); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 40px; }
-        .page-header { margin-bottom: 30px; text-align: center; }
-        .page-title { font-size: 2.5em; background: linear-gradient(90deg, #00d4ff, #00ff88); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
-        .card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 30px; margin-bottom: 30px; }
-        .card-title { font-size: 1.5em; color: #00ff88; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        .placeholder-content { text-align: center; padding: 50px; color: #aaa; border: 2px dashed rgba(255, 255, 255, 0.1); border-radius: 15px; }
-        .btn-back { display: inline-block; padding: 10px 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; border-radius: 8px; text-decoration: none; transition: all 0.3s ease; }
-        .btn-back:hover { background: rgba(0, 255, 136, 0.1); border-color: #00ff88; }
-    </style>
-</head>
-<body>
-    <nav class="navbar">
-        <a href="{{ url_for('logout') }}" style="color: #ff6b6b; text-decoration: none; font-weight: 600;">Logout</a>
-        <a href="{{ url_for('index') }}" class="logo">
-            <span class="logo-icon">🔐</span>
-            <span class="logo-text">HealthCrypto</span>
-        </a>
-    </nav>
-    
-    <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="flash {{ category }}" style="padding: 15px; border-radius: 10px; margin-bottom: 20px; background: rgba(0, 255, 136, 0.2); border: 1px solid #00ff88; color: #00ff88;">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
+{% extends "base.html" %}
 
-        <div class="page-header">
-            <h1 class="page-title">📄 Patient Medical Reports</h1>
-            <p style="color: #aaa;">Secure access to patient medical histories and diagnostic reports</p>
-        </div>
-        
-        <div class="card">
-            <h2 class="card-title">📝 Create New Medical Report</h2>
-            <form method="POST" style="display: grid; grid-template-columns: 1fr; gap: 20px;">
-                <div class="form-group">
-                    <label style="display: block; margin-bottom: 8px; color: #00ff88;">Patient ID</label>
-                    <input type="text" name="patient_id" placeholder="P-1001" required style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff;">
-                </div>
-                <div class="form-group">
-                    <label style="display: block; margin-bottom: 8px; color: #00ff88;">Patient Name</label>
-                    <input type="text" name="patient_name" required style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff;">
-                </div>
-                <div class="form-group">
-                    <label style="display: block; margin-bottom: 8px; color: #00ff88;">Diagnosis</label>
-                    <input type="text" name="diagnosis" required style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff;">
-                </div>
-                <div class="form-group">
-                    <label style="display: block; margin-bottom: 8px; color: #00ff88;">Clinical Notes</label>
-                    <textarea name="notes" rows="4" style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff;"></textarea>
-                </div>
-                <button type="submit" style="width: 100%; padding: 15px; background: linear-gradient(90deg, #00ff88, #00d4ff); color: #1a1a2e; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;">Save Secure Report</button>
-            </form>
-        </div>
+{% block title %}Medical Reports - Healthcare Crypto System{% endblock %}
+{% block topbar_title %}Medical Reports{% endblock %}
 
-        <div class="card">
-            <h2 class="card-title">🩺 Diagnostic History</h2>
-            {% if reports %}
-                <div style="display: grid; gap: 20px;">
-                    {% for r in reports %}
-                    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 15px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <h3 style="color: #00ff88;">{{ r.patient_name }}</h3>
-                            <span style="color: #666; font-size: 0.8em;">#{{ r.id }}</span>
-                        </div>
-                        <p><strong>Diagnosis:</strong> {{ r.diagnosis }}</p>
-                        <p style="margin-top: 10px; color: #ccc;">{{ r.notes }}</p>
-                        <div style="margin-top: 15px; font-size: 0.8em; color: #555; display: flex; justify-content: space-between;">
-                            <span>By: {{ r.doctor }}</span>
-                            <span>Secured: AES-256-GCM</span>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="placeholder-content">
-                    <span style="font-size: 3em; display: block; margin-bottom: 15px;">📁</span>
-                    <p>No medical reports available in the secure vault.</p>
-                </div>
-            {% endif %}
-        </div>
-        
-        <a href="{{ url_for('index') }}" class="btn-back">← Back to Dashboard</a>
+{% block content %}
+<a href="{{ url_for('index') }}" class="back-link">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to Dashboard
+</a>
+
+<div class="page-header">
+    <div class="page-header-text">
+        <h2>Patient Medical Reports</h2>
+        <p>Secure access to patient medical histories and diagnostic reports, encrypted with AES-256-GCM.</p>
     </div>
-</body>
-</html>
+</div>
+
+<div class="card">
+    <h3 class="card-title">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Create New Medical Report
+    </h3>
+    <form method="POST">
+        <div class="form-group">
+            <label>Patient ID</label>
+            <input type="text" name="patient_id" placeholder="P-1001" required class="form-input">
+        </div>
+        <div class="form-group">
+            <label>Patient Name</label>
+            <input type="text" name="patient_name" required class="form-input">
+        </div>
+        <div class="form-group">
+            <label>Diagnosis</label>
+            <input type="text" name="diagnosis" required class="form-input">
+        </div>
+        <div class="form-group">
+            <label>Clinical Notes</label>
+            <textarea name="notes" rows="4" class="form-textarea"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Save Secure Report</button>
+    </form>
+</div>
+
+<div class="card">
+    <h3 class="card-title">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Diagnostic History
+    </h3>
+    {% if reports %}
+    <div style="display: grid; gap: 12px;">
+        {% for r in reports %}
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius-md);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <h4 style="color: var(--text-primary); font-weight: 600;">{{ r.patient_name }}</h4>
+                <span class="badge badge-info">#{{ r.id }}</span>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.9em;"><strong style="color: var(--text-primary);">Diagnosis:</strong> {{ r.diagnosis }}</p>
+            <p style="margin-top: 8px; color: var(--text-muted); font-size: 0.88em;">{{ r.notes }}</p>
+            <div style="margin-top: 14px; font-size: 0.78em; color: var(--text-muted); display: flex; justify-content: space-between;">
+                <span>By: {{ r.doctor }}</span>
+                <span class="badge badge-success">AES-256-GCM</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <p>No medical reports available in the secure vault.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

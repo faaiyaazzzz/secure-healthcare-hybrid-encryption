@@ -9,6 +9,10 @@ from secure_record import decrypt_record
 from dicom_signature import verify_dict_signed, get_signing_keys
 
 
+# Project directory
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+RECIPIENT_KEYS_DIR = os.path.join(PROJECT_DIR, "recipient_keys")
+
 def extract_payload_from_eml(eml_path):
     """Extract JSON payload from an .eml email file"""
     try:
@@ -43,55 +47,46 @@ def decrypt_received_payload(payload_path, receiver_email, role="doctor", verify
         verify_signature_flag: Whether to verify digital signature
     
     Returns:
-        bool: True if decryption and verification successful
+        tuple: (success: bool, message: str, decrypted_data: dict or None)
     """
     safe_email = receiver_email.replace("@", "_").replace(".", "_")
-    priv_key_path = f"recipient_keys/{safe_email}_private.pem"
+    priv_key_path = os.path.join(RECIPIENT_KEYS_DIR, f"{safe_email}_private.pem")
 
     # Check if private key exists
     if not os.path.exists(priv_key_path):
-        print(f"[ERROR] Private key not found: {priv_key_path}")
-        print(f"[INFO] Available private keys:")
-        for f in os.listdir("recipient_keys"):
-            if f.endswith("_private.pem"):
-                print(f"  - {f}")
-        return False
+        msg = f"Private key not found: {priv_key_path}"
+        print(f"[ERROR] {msg}")
+        return False, msg, None
 
     # Determine payload source
     payload = None
     if payload_path.endswith('.eml'):
         # Extract from email file
         if not os.path.exists(payload_path):
-            print(f"[ERROR] Email file not found: {payload_path}")
-            # Try to find the latest email in outbox
-            outbox_dir = "outbox"
-            if os.path.exists(outbox_dir):
-                eml_files = [f for f in os.listdir(outbox_dir) if f.endswith('.eml')]
-                if eml_files:
-                    eml_files.sort()
-                    latest_eml = os.path.join(outbox_dir, eml_files[-1])
-                    print(f"[INFO] Using latest email: {latest_eml}")
-                    payload = extract_payload_from_eml(latest_eml)
-                    if payload:
-                        payload_path = latest_eml
+            msg = f"Email file not found: {payload_path}"
+            print(f"[ERROR] {msg}")
+            return False, msg, None
         else:
             payload = extract_payload_from_eml(payload_path)
     else:
         # Load from JSON file
         if not os.path.exists(payload_path):
-            print(f"[ERROR] Payload file not found: {payload_path}")
-            # Try to find secure_payload.json in project root
-            if os.path.exists("secure_payload.json"):
-                with open("secure_payload.json", "r") as f:
-                    payload = json.load(f)
-                payload_path = "secure_payload.json"
+            msg = f"Payload file not found: {payload_path}"
+            print(f"[ERROR] {msg}")
+            return False, msg, None
         else:
-            with open(payload_path, "r") as f:
-                payload = json.load(f)
+            try:
+                with open(payload_path, "r") as f:
+                    payload = json.load(f)
+            except json.JSONDecodeError:
+                msg = "The file is not a valid JSON payload. Please ensure you are uploading the original encrypted file."
+                print(f"[ERROR] {msg}")
+                return False, msg, None
 
     if payload is None:
-        print("[ERROR] No payload found to decrypt")
-        return False
+        msg = "No payload found to decrypt"
+        print(f"[ERROR] {msg}")
+        return False, msg, None
 
     # Verify digital signature if present and requested
     signature_verified = False
@@ -105,13 +100,10 @@ def decrypt_received_payload(payload_path, receiver_email, role="doctor", verify
                     print("[OK] Digital signature VERIFIED - sender authenticity confirmed")
                 else:
                     print("[ERROR] Digital signature VERIFICATION FAILED!")
-                    print("[WARN] WARNING: Data may be tampered or from unknown sender!")
             else:
                 print("[WARN] Signing public key not found, skipping signature verification")
         except Exception as e:
             print(f"[WARN] Signature verification error: {e}")
-    elif verify_signature_flag:
-        print("[INFO] No digital signature found in payload")
 
     # Decrypt AES envelope key using RSA private key
     try:
@@ -120,10 +112,9 @@ def decrypt_received_payload(payload_path, receiver_email, role="doctor", verify
             priv_key_path
         )
     except Exception as e:
-        print(f"[ERROR] Failed to decrypt AES key: {e}")
-        print("[INFO] This usually means the payload was encrypted with a different recipient's public key.")
-        print("[INFO] Please go to /encrypt to create new data, then send email to yourself.")
-        return False
+        msg = "Failed to decrypt AES key: Incorrect decryption. This usually means the payload was encrypted with a different recipient's public key."
+        print(f"[ERROR] {msg}")
+        return False, msg, None
 
     # Decrypt email envelope (integrity verified here)
     try:
@@ -134,8 +125,9 @@ def decrypt_received_payload(payload_path, receiver_email, role="doctor", verify
             bytes.fromhex(payload["tag"])
         )
     except Exception as e:
-        print(f"[ERROR] Failed to decrypt payload: {e}")
-        return False
+        msg = f"Failed to decrypt payload: {e}"
+        print(f"[ERROR] {msg}")
+        return False, msg, None
 
     print("\n[OK] Email integrity verified.")
 
@@ -144,26 +136,21 @@ def decrypt_received_payload(payload_path, receiver_email, role="doctor", verify
         decrypted_data = json.loads(plaintext.decode())
         
         if isinstance(decrypted_data, dict) and decrypted_data.get('package_type') == 'medical_image':
-            print("\n[OK] Decrypted Medical Image Package:")
-            print(f"  - Original Filename: {decrypted_data.get('filename')}")
-            print(f"  - Timestamp: {decrypted_data.get('timestamp')}")
-            print(f"  - Sent by: {decrypted_data.get('doctor')}")
-            print(f"  - Key ID: {decrypted_data.get('key_id')}")
-            print("\n[INFO] To view the image, the cipher data needs to be decrypted with the active AES key.")
-            return True
+            return True, "Medical Image Package Decrypted Successfully", decrypted_data
             
         # Otherwise, treat as standard RBAC-encrypted data
         rbac_encrypted_record = decrypted_data
     except json.JSONDecodeError:
-        print("[ERROR] Decrypted payload is not valid JSON")
-        return False
+        msg = "Decrypted payload is not valid JSON"
+        print(f"[ERROR] {msg}")
+        return False, msg, None
 
     # Apply RBAC decryption
     final_data = decrypt_record(rbac_encrypted_record, role=role)
 
     print(f"\n[OK] Decrypted data (RBAC enforced for role='{role}'):")
     print(json.dumps(final_data, indent=2))
-    return True
+    return True, f"Data decrypted successfully (Role: {role})", final_data
 
 
 if __name__ == "__main__":
