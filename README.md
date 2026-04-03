@@ -44,6 +44,43 @@ graph TD
     end
 ```
 
+### **Secure Email Exchange (Sequence Diagram)**
+
+```mermaid
+sequenceDiagram
+    participant S as Sender (Doctor)
+    participant E as Encryption Engine
+    participant T as Transport (Email)
+    participant R as Receiver (Patient)
+    
+    S->>E: Plaintext Data + Recipient ID
+    E->>E: Generate random 256-bit AES Key (K)
+    E->>E: Encrypt Data with K (AES-GCM)
+    Note right of E: Ciphertext + Auth Tag + IV
+    E->>E: Fetch Recipient's RSA Public Key
+    E->>E: Wrap K with RSA Public Key
+    E->>T: Send Secure Payload (JSON/EML)
+    T->>R: Receive Encrypted Payload
+    R->>E: Provide RSA Private Key
+    E->>E: Unwrap K using RSA Private Key
+    E->>E: Decrypt Data using K + Tag + IV
+    E->>R: Original Plaintext Data
+```
+
+### **Key Lifecycle & Rotation (State Diagram)**
+
+```mermaid
+stateDiagram-v2
+    [*] --> Generation: Secure KeyGen (os.urandom)
+    Generation --> Storage: RSA (PEM) / AES (Ephemeral)
+    Storage --> Usage: Encryption/Decryption
+    Usage --> Verification: Audit & Tamper Check
+    Verification --> Usage: OK
+    Verification --> Rotation: Integrity Breach / Expiry
+    Rotation --> Generation: Renew RSA Key Pair
+    Rotation --> [*]: Revoke Keys
+```
+
 ---
 
 ## 🧠 **Core Algorithms**
@@ -53,11 +90,16 @@ The system uses **Envelope Encryption** to combine the efficiency of symmetric e
 
 **Encryption Procedure:**
 1.  **Symmetric Key Generation**: A cryptographically secure 256-bit random key ($K_{aes}$) is generated for every operation.
-2.  **Data Encryption**: The plaintext ($P$) is encrypted using AES-256 in Galois/Counter Mode (GCM).
-    - $C, T = E_{aes}(K_{aes}, IV, P)$
-    - Where $C$ is Ciphertext, $T$ is the Authentication Tag, and $IV$ is the Initialization Vector.
-3.  **Asymmetric Key Wrapping**: The session key $K_{aes}$ is encrypted using the recipient's RSA-2048 Public Key ($PK_{rsa}$).
-    - $E_{key} = E_{rsa}(PK_{rsa}, K_{aes})$
+2.  **Data Encryption (AES-GCM)**: 
+    - The plaintext ($P$) is encrypted using AES-256 in Galois/Counter Mode (GCM).
+    - **CTR Mode**: Provides confidentiality through stream encryption.
+    - **GHASH**: Computes a message authentication code (MAC) for integrity.
+    - $C, T = E_{aes}(K_{aes}, IV, P, AAD)$
+    - Where $AAD$ is Additional Authenticated Data (Metadata).
+3.  **Asymmetric Key Wrapping (RSA-OAEP)**:
+    - The session key $K_{aes}$ is encrypted using RSA-2048 with **Optimal Asymmetric Encryption Padding (OAEP)**.
+    - OAEP prevents plain-RSA vulnerabilities and ensures semantically secure encryption.
+    - $E_{key} = E_{rsa\_oaep}(PK_{rsa}, K_{aes}, MGF1, SHA256)$
 4.  **Packaging**: The final payload contains $[E_{key}, C, T, IV]$.
 
 ### **2. Hash-Chained Audit Algorithm**
@@ -66,7 +108,13 @@ To ensure log integrity, every entry is cryptographically linked to the previous
 **Logging Formula:**
 - $H_n = \text{SHA-256}(Timestamp | Event | Message | H_{n-1})$
 - Where $H_n$ is the hash of the current log entry and $H_{n-1}$ is the hash of the preceding entry.
-- **Verification**: If any single bit in any log entry is changed, the entire chain of hashes from that point forward will fail validation.
+- **Verification Logic**:
+    ```python
+    expected_hash = SHA256(current_entry_data + last_verified_hash)
+    if current_entry.hash != expected_hash:
+        raise TamperAlert("Integrity Failure detected at entry N")
+    ```
+- **Security Guarantee**: If any single bit in any log entry is changed, the entire chain of hashes from that point forward will fail validation.
 
 ---
 
