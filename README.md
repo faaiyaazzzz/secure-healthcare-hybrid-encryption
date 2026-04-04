@@ -8,6 +8,39 @@
 
 ---
 
+## 🌐 **System Overview**
+
+This platform is a comprehensive healthcare management system that prioritizes data security above all else. It's built for hospitals and clinics to manage patient data without worrying about data breaches.
+
+```mermaid
+graph LR
+    subgraph "Frontend (User Interface)"
+        UI[Web Dashboard]
+        Login[Secure Login]
+    end
+
+    subgraph "Backend Engine"
+        App[Flask Application]
+        Crypto[Hybrid Crypto Engine]
+        Logger[Audit Chain Logger]
+    end
+
+    subgraph "Data Storage"
+        JSON[Encrypted Records]
+        Uploads[Secure Image Store]
+        Audit[Hash-Chained Logs]
+    end
+
+    UI <--> App
+    App <--> Crypto
+    App <--> Logger
+    Crypto <--> JSON
+    Crypto <--> Uploads
+    Logger <--> Audit
+```
+
+---
+
 ## 🏛️ **System Architecture**
 
 The system employs a multi-layered security architecture designed to protect sensitive Electronic Health Records (EHR) through its entire lifecycle: **In-Transit, In-Use, and At-Rest**.
@@ -83,38 +116,95 @@ stateDiagram-v2
 
 ---
 
-## 🧠 **Core Algorithms**
+## 🗺️ **User Journey & Experience**
+
+We've designed the system to be intuitive while remaining incredibly secure. Here's what a typical interaction looks like for a medical professional:
+
+```mermaid
+journey
+    title Doctor's Data Management Journey
+    section Authentication
+      Secure Login: 5: Doctor
+      Role Selection: 4: Doctor
+    section Clinical Work
+      Access Patient Record: 5: Doctor
+      Encrypt New Lab Result: 5: Doctor
+      Generate Digital Prescription: 4: Doctor
+    section Security Verification
+      Check Audit Log: 4: Doctor
+      Verify Data Integrity: 5: Doctor
+```
+
+---
+
+## 🎨 **Visual Tour (Mock Layouts)**
+
+Since we prioritize a clean and modern user interface, here are representative layouts of our key dashboards:
+
+### **1. Professional Login Interface**
+A sleek, glassmorphism-inspired login card with a thematic healthcare background and security features like password visibility toggles.
+```mermaid
+graph TD
+    subgraph "Login Page Layout"
+        A[Thematic Background Image]
+        B[Secure Login Card]
+        C[Username Field]
+        D[Password Field with Toggle]
+        E[Role Selection Dropdown]
+        F[Sign In Button]
+        G[Branding & Security Features Panel]
+    end
+```
+
+### **2. Patient Dashboard (Full-Width Focused)**
+A focused view without sidebars, allowing patients to easily see their health overview and access key services.
+```mermaid
+graph TD
+    subgraph "Patient Dashboard Layout"
+        H[Top Navigation Bar]
+        I[Health Stats Cards: Meds, Reports, Appointments]
+        J[Main Services Grid: Reports, Prescriptions, Chat, Profile]
+        K[Upcoming Appointments Timeline]
+    end
+```
+
+### **3. Admin Security Dashboard**
+A data-driven view with real-time stats and a live activity feed.
+```mermaid
+graph TD
+    subgraph "Admin Dashboard Layout"
+        L[System-Wide Stats: Total Users, Alerts, Encryptions]
+        M[Live System Activity Feed: Table with Badges]
+        N[System Health Sidebar: Integrity & Key Status]
+        O[Quick Admin Actions Panel]
+    end
+```
+
+---
+
+## 💎 **Why Choose this System?**
+
+This platform isn't just about managing data—it's about building trust between patients and healthcare providers.
+
+| Benefit | How we do it |
+| :--- | :--- |
+| **Absolute Privacy** | Using AES-256-GCM, we ensure that your records are unreadable to anyone without the proper key. |
+| **Key Security** | RSA-2048 allows secure key exchange, meaning the encryption keys themselves are never exposed. |
+| **Immutable History** | Our hash-chained audit log ensures that every single action is recorded and can never be altered. |
+| **Professional Experience** | A clean, modern UI designed to make complex security features feel simple and intuitive. |
+
+---
+
+## 🧠 **Core Algorithms** (Simplified)
 
 ### **1. Hybrid RSA-AES Encryption Flow**
-The system uses **Envelope Encryption** to combine the efficiency of symmetric encryption with the security of asymmetric key exchange.
-
-**Encryption Procedure:**
-1.  **Symmetric Key Generation**: A cryptographically secure 256-bit random key ($K_{aes}$) is generated for every operation.
-2.  **Data Encryption (AES-GCM)**: 
-    - The plaintext ($P$) is encrypted using AES-256 in Galois/Counter Mode (GCM).
-    - **CTR Mode**: Provides confidentiality through stream encryption.
-    - **GHASH**: Computes a message authentication code (MAC) for integrity.
-    - $C, T = E_{aes}(K_{aes}, IV, P, AAD)$
-    - Where $AAD$ is Additional Authenticated Data (Metadata).
-3.  **Asymmetric Key Wrapping (RSA-OAEP)**:
-    - The session key $K_{aes}$ is encrypted using RSA-2048 with **Optimal Asymmetric Encryption Padding (OAEP)**.
-    - OAEP prevents plain-RSA vulnerabilities and ensures semantically secure encryption.
-    - $E_{key} = E_{rsa\_oaep}(PK_{rsa}, K_{aes}, MGF1, SHA256)$
-4.  **Packaging**: The final payload contains $[E_{key}, C, T, IV]$.
+Imagine a lock and a key. **AES** is the fast, secure lock that protects the data. **RSA** is a special safe that holds the AES key.
+1.  We generate a new AES key for every patient record.
+2.  The patient's record is locked with the AES key.
+3.  The AES key itself is then locked inside an RSA "safe" that only the authorized recipient can open.
 
 ### **2. Hash-Chained Audit Algorithm**
-To ensure log integrity, every entry is cryptographically linked to the previous one, creating an immutable chain.
-
-**Logging Formula:**
-- $H_n = \text{SHA-256}(Timestamp | Event | Message | H_{n-1})$
-- Where $H_n$ is the hash of the current log entry and $H_{n-1}$ is the hash of the preceding entry.
-- **Verification Logic**:
-    ```python
-    expected_hash = SHA256(current_entry_data + last_verified_hash)
-    if current_entry.hash != expected_hash:
-        raise TamperAlert("Integrity Failure detected at entry N")
-    ```
-- **Security Guarantee**: If any single bit in any log entry is changed, the entire chain of hashes from that point forward will fail validation.
+Think of this as a digital fingerprint for every action. Each log entry is linked to the one before it. If someone tries to change an old log entry, the whole chain breaks, immediately alerting the administrator.
 
 ---
 
