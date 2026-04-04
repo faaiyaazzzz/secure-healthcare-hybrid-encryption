@@ -148,33 +148,15 @@ A secure encryption system should produce a flat (uniform) histogram for the enc
 
 #### **Original Image (Predictable Peaks)**
 In medical images (like X-rays), pixel values are concentrated in specific ranges, creating a "peaky" histogram.
-```mermaid
-xychart-beta
-    title "Original Histogram (Peaky)"
-    x-axis ["0", "64", "128", "192", "255"]
-    y-axis "Frequency"
-    line [15, 95, 40, 85, 20]
-```
+![Original Histogram](docs/assets/original_histogram.png)
 
 #### **Encrypted Image (Uniform Distribution)**
 AES-256-GCM encryption scatters the pixel values uniformly, resulting in a flat histogram—the gold standard for cryptographic strength.
-```mermaid
-xychart-beta
-    title "Encrypted Histogram (Flat)"
-    x-axis ["0", "64", "128", "192", "255"]
-    y-axis "Frequency"
-    bar [55, 55, 55, 55, 55]
-```
+![Encrypted Histogram](docs/assets/encrypted_histogram.png)
 
 #### **Decrypted Image (Exact Restoration)**
 The system guarantees lossless decryption, restoring the original pixel distribution exactly.
-```mermaid
-xychart-beta
-    title "Decrypted Histogram (Restored)"
-    x-axis ["0", "64", "128", "192", "255"]
-    y-axis "Frequency"
-    line [15, 95, 40, 85, 20]
-```
+![Decrypted Histogram](docs/assets/decrypted_histogram.png)
 
 ### **2. Pixel Correlation Distribution**
 Adjacent pixels in medical images are highly correlated. Our encryption engine eliminates this, transforming structured data into "white noise".
@@ -191,6 +173,8 @@ xychart-beta
 
 ### **3. Local Entropy Distribution Heatmap**
 Entropy measures the uncertainty or randomness in an image. For medical images, original data has low entropy in consistent regions, while encrypted data should show high, uniform entropy across the entire heatmap.
+
+![Entropy Heatmap](docs/assets/entropy_heatmap.png)
 
 | Metric | Original Image | Encrypted Image | Ideal Value |
 | :--- | :--- | :--- | :--- |
