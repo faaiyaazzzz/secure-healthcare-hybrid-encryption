@@ -281,6 +281,56 @@ We use **NPCR** and **UACI** to measure the sensitivity of the encryption to sma
 
 ---
 
+## 📐 **Mathematical Foundations**
+
+The security of the system is backed by rigorous mathematical models and standard cryptographic primitives.
+
+### **1. Hybrid Encryption (Envelope Model)**
+The system uses AES-256-GCM for data confidentiality and RSA-2048-OAEP for key security.
+
+**AES-GCM Authenticated Encryption:**
+$$C, T = E_{AES-GCM}(K_{session}, IV, P, AAD)$$
+- $P$: Plaintext healthcare data.
+- $K_{session}$: 256-bit ephemeral session key.
+- $IV$: 96-bit initialization vector.
+- $AAD$: Additional Authenticated Data (Metadata).
+- $C$: Ciphertext.
+- $T$: 128-bit Authentication Tag (MAC).
+
+**RSA-OAEP Key Wrapping:**
+$$E_K = E_{RSA-OAEP}(PK_{recipient}, K_{session})$$
+- $PK_{recipient}$: Recipient's 2048-bit RSA Public Key.
+- $E_K$: Encrypted (wrapped) session key.
+
+### **2. Immutable Audit Logging (Hash-Chaining)**
+Each log entry is cryptographically linked to the previous one, forming a blockchain-inspired integrity chain.
+
+**Chaining Formula:**
+$$H_i = \text{SHA-256}(T_i \parallel E_i \parallel M_i \parallel H_{i-1})$$
+- $H_i$: Hash of the current log entry.
+- $T_i, E_i, M_i$: Timestamp, Event Type, and Message.
+- $H_{i-1}$: Hash of the immediately preceding entry.
+- $\parallel$: Concatenation operator.
+
+### **3. Security Validation Metrics**
+We use the following formulas to validate the randomness and robustness of our image encryption engine.
+
+**Shannon Entropy (Randomness):**
+$$H(X) = -\sum_{i=0}^{255} P(x_i) \log_2 P(x_i)$$
+- $P(x_i)$: Probability of pixel value $i$ occurring in the image.
+
+**NPCR (Number of Pixels Change Rate):**
+$$NPCR = \frac{\sum_{i,j} D(i,j)}{W \times H} \times 100\%$$
+- $D(i,j) = 1$ if $c_1(i,j) \neq c_2(i,j)$, else $0$.
+
+**UACI (Unified Average Changing Intensity):**
+$$UACI = \frac{1}{W \times H} \left[ \sum_{i,j} \frac{|c_1(i,j) - c_2(i,j)|}{255} \right] \times 100\%$$
+
+**Correlation Coefficient:**
+$$r_{xy} = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum (x_i - \bar{x})^2 \sum (y_i - \bar{y})^2}}$$
+
+---
+
 ## 🛠️ **Installation & Setup**
 
 ### **Prerequisites**
