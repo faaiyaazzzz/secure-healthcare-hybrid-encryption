@@ -2,7 +2,7 @@ import json
 from secure_record import decrypt_record
 from audit_logger import log_event
 
-ENCRYPTED_FILE = "encrypted_record.json"
+ENCRYPTED_FILE = "secure_payload.json"
 
 def decrypt_workflow(role="doctor"):
     with open(ENCRYPTED_FILE, "r") as f:

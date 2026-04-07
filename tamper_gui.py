@@ -3,12 +3,17 @@ import json
 import os
 
 
-def log(msg, output):
-    output.insert(tk.END, msg + "\n")
-    output.see(tk.END)
+import sys
+
+def log(msg, output=None):
+    if output:
+        output.insert(tk.END, msg + "\n")
+        output.see(tk.END)
+    else:
+        print(msg)
 
 
-def tamper_payload(output):
+def tamper_payload(output=None):
     if not os.path.exists("secure_payload.json"):
         log("[ERROR] secure_payload.json not found", output)
         return
@@ -16,17 +21,28 @@ def tamper_payload(output):
     with open("secure_payload.json", "r") as f:
         payload = json.load(f)
 
+    # Payload is a dict of field: {ciphertext, nonce, tag}
+    # Pick the first field to tamper with
+    fields = list(payload.keys())
+    if not fields:
+        log("[ERROR] Payload has no fields to tamper with", output)
+        return
+        
+    field_to_tamper = fields[0]
+    data = payload[field_to_tamper]
+    
     # Flip one hex character in ciphertext
-    ct = payload["ciphertext"]
-    payload["ciphertext"] = ct[:-1] + ("0" if ct[-1] != "0" else "1")
+    ct = data["ciphertext"]
+    data["ciphertext"] = ct[:-1] + ("0" if ct[-1] != "0" else "1")
+    payload[field_to_tamper] = data
 
     with open("secure_payload.json", "w") as f:
         json.dump(payload, f, indent=2)
 
-    log("[ATTACK] Payload tampered (ciphertext modified)", output)
+    log(f"[ATTACK] Payload tampered (field '{field_to_tamper}' modified)", output)
 
 
-def tamper_audit_log(output):
+def tamper_audit_log(output=None):
     if not os.path.exists("audit.log"):
         log("[ERROR] audit.log not found", output)
         return
@@ -37,7 +53,7 @@ def tamper_audit_log(output):
     log("[ATTACK] Audit log tampered (hash chain broken)", output)
 
 
-def reset_system(output):
+def reset_system(output=None):
     removed_any = False
 
     for file in ["secure_payload.json", "audit.log"]:
@@ -106,4 +122,16 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        action = sys.argv[1]
+        if action == "tamper-payload":
+            tamper_payload()
+        elif action == "tamper-audit":
+            tamper_audit_log()
+        elif action == "reset":
+            reset_system()
+        else:
+            print(f"Unknown action: {action}")
+            sys.exit(1)
+    else:
+        main()

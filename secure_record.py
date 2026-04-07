@@ -26,12 +26,17 @@ def decrypt_record(encrypted_record: dict, role: str):
     for field in visible:
         if field in encrypted_record:
             data = encrypted_record[field]
-            plaintext = decrypt_gcm(
-                bytes.fromhex(data["ciphertext"]),
-                key,
-                bytes.fromhex(data["nonce"]),
-                bytes.fromhex(data["tag"])
-            )
-            output[field] = plaintext.decode()
+            try:
+                plaintext = decrypt_gcm(
+                    bytes.fromhex(data["ciphertext"]),
+                    key,
+                    bytes.fromhex(data["nonce"]),
+                    bytes.fromhex(data["tag"])
+                )
+                output[field] = plaintext.decode()
+            except ValueError:
+                output[field] = "[ERROR: TAMPERED]"
+            except Exception as e:
+                output[field] = f"[ERROR: {str(e)}]"
 
     return output

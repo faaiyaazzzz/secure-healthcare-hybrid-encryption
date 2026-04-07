@@ -919,8 +919,8 @@ def encrypt_image():
             from image_analysis import (
                 calculate_npcr, calculate_uaci, calculate_correlation,
                 calculate_entropy, calculate_psnr, generate_histogram,
-                generate_entropy_heatmap, apply_salt_and_pepper,
-                apply_bit_flipping, apply_compression
+                generate_correlation_plot, generate_entropy_heatmap,
+                apply_salt_and_pepper, apply_bit_flipping, apply_compression
             )
             from PIL import Image
 
@@ -955,6 +955,12 @@ def encrypt_image():
                 ),
                 'enc_hist': generate_histogram(
                     enc_img, 'Encrypted Image Histogram'
+                ),
+                'orig_corr_plot': generate_correlation_plot(
+                    orig_img, 'Original Image Pixel Correlation'
+                ),
+                'enc_corr_plot': generate_correlation_plot(
+                    enc_img, 'Encrypted Image Pixel Correlation'
                 ),
                 'entropy_heatmap': generate_entropy_heatmap(orig_img)
             }
@@ -1228,6 +1234,15 @@ def decrypt():
     """Decryption page"""
     if request.method == 'POST':
         role = request.form.get('role', 'doctor')
+        
+        # Check if a file was uploaded
+        if 'payload_file' in request.files:
+            file = request.files['payload_file']
+            if file and file.filename != '':
+                file_path = os.path.join(PROJECT_DIR, 'secure_payload.json')
+                file.save(file_path)
+                flash('Payload file uploaded successfully.', 'success')
+
         output, code = run_python_script('main.py', ['decrypt', role])
         flash(f'Decryption Output (Role: {role}):\n{output}',
               'success' if code == 0 else 'error')

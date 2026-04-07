@@ -88,6 +88,36 @@ def generate_histogram(img, title):
     return base64.b64encode(buf.getvalue()).decode('utf-8')
 
 
+def generate_correlation_plot(img, title):
+    """Generate correlation plot of adjacent pixels (horizontal)"""
+    img_array = np.array(img).astype(np.float64)
+    if len(img_array.shape) == 3:
+        img_array = np.mean(img_array, axis=2)
+
+    x = img_array[:, :-1].flatten()
+    y = img_array[:, 1:].flatten()
+
+    # Sample if too large
+    if len(x) > 5000:
+        indices = np.random.choice(len(x), 5000, replace=False)
+        x = x[indices]
+        y = y[indices]
+
+    plt.figure(figsize=(6, 5))
+    plt.scatter(x, y, s=1, alpha=0.5, color='blue')
+    plt.title(title)
+    plt.xlabel('Pixel value (x, y)')
+    plt.ylabel('Pixel value (x+1, y)')
+    plt.xlim(0, 255)
+    plt.ylim(0, 255)
+    plt.grid(True, linestyle='--', alpha=0.3)
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    return base64.b64encode(buf.getvalue()).decode('utf-8')
+
+
 def generate_entropy_heatmap(img):
     """Generate local entropy heatmap"""
     from skimage.filters.rank import entropy as local_entropy

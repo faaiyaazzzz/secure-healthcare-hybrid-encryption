@@ -90,12 +90,45 @@
         .sidebar-brand { font-size: 1.05em; font-weight: 700; color: white; letter-spacing: -0.2px; }
         .sidebar-brand small { display: block; font-size: 0.7em; color: var(--text-muted); font-weight: 500; letter-spacing: 0; }
 
-        .nav-group { padding: 16px 12px 8px; }
+        .nav-group { padding: 8px 12px; }
         .nav-group-label {
-            font-size: 0.7em; font-weight: 600;
-            text-transform: uppercase; letter-spacing: 1px;
+            font-size: 0.72em; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1.2px;
             color: var(--text-muted);
-            padding: 0 10px; margin-bottom: 6px;
+            padding: 10px; margin-bottom: 4px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: space-between;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .nav-group-label:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.03); }
+
+        .nav-group-label::after {
+            content: "";
+            width: 5px; height: 5px;
+            border-right: 2px solid currentColor;
+            border-bottom: 2px solid currentColor;
+            transform: rotate(45deg);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-right: 4px;
+            opacity: 0.5;
+        }
+
+        .nav-group.collapsed .nav-group-label::after { transform: rotate(-135deg); }
+
+        .nav-items-container {
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            opacity: 1;
+        }
+
+        .nav-group.collapsed .nav-items-container {
+            max-height: 0;
+            opacity: 0;
+            pointer-events: none;
         }
 
         .nav-item {
@@ -506,101 +539,109 @@
             </div>
 
             <div class="nav-group">
-                <div class="nav-group-label">Main</div>
-                <a href="{{ url_for('index') }}" class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                    Dashboard
-                </a>
-                <a href="{{ url_for('about') }}" class="nav-item {% if request.endpoint == 'about' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                    About
-                </a>
+                <div class="nav-group-label" onclick="toggleNavGroup(this)">Main</div>
+                <div class="nav-items-container">
+                    <a href="{{ url_for('index') }}" class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                        Dashboard
+                    </a>
+                    <a href="{{ url_for('about') }}" class="nav-item {% if request.endpoint == 'about' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        About
+                    </a>
+                </div>
             </div>
 
             <div class="nav-group">
-                <div class="nav-group-label">Clinical</div>
-                <a href="{{ url_for('lab_results') }}" class="nav-item {% if request.endpoint == 'lab_results' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-                    Lab Results
-                </a>
-                <a href="{{ url_for('prescriptions') }}" class="nav-item {% if request.endpoint == 'prescriptions' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-                    Prescriptions
-                </a>
-                <a href="{{ url_for('medical_reports') }}" class="nav-item {% if request.endpoint == 'medical_reports' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                    Medical Reports
-                </a>
-                <a href="{{ url_for('appointments') }}" class="nav-item {% if request.endpoint == 'appointments' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    Appointments
-                </a>
-                <a href="{{ url_for('patient_records') }}" class="nav-item {% if request.endpoint == 'patient_records' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    Patient Records
-                </a>
+                <div class="nav-group-label" onclick="toggleNavGroup(this)">Clinical</div>
+                <div class="nav-items-container">
+                    <a href="{{ url_for('lab_results') }}" class="nav-item {% if request.endpoint == 'lab_results' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        Lab Results
+                    </a>
+                    <a href="{{ url_for('prescriptions') }}" class="nav-item {% if request.endpoint == 'prescriptions' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                        Prescriptions
+                    </a>
+                    <a href="{{ url_for('medical_reports') }}" class="nav-item {% if request.endpoint == 'medical_reports' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        Medical Reports
+                    </a>
+                    <a href="{{ url_for('appointments') }}" class="nav-item {% if request.endpoint == 'appointments' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        Appointments
+                    </a>
+                    <a href="{{ url_for('patient_records') }}" class="nav-item {% if request.endpoint == 'patient_records' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        Patient Records
+                    </a>
+                </div>
             </div>
 
             <div class="nav-group">
-                <div class="nav-group-label">Security</div>
-                <a href="{{ url_for('encrypt_image') }}" class="nav-item {% if request.endpoint == 'encrypt_image' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                    Image Encryption
-                </a>
-                <a href="{{ url_for('decrypt_image') }}" class="nav-item {% if request.endpoint == 'decrypt_image' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
-                    Image Decryption
-                </a>
-                <a href="{{ url_for('send_email') }}" class="nav-item {% if request.endpoint == 'send_email' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                    Send Secure Email
-                </a>
-                <a href="{{ url_for('receive_email') }}" class="nav-item {% if request.endpoint == 'receive_email' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
-                    Receive Payload
-                </a>
-                {% if session.get('role') == 'admin' %}
-                <a href="{{ url_for('encrypt') }}" class="nav-item {% if request.endpoint == 'encrypt' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    Encrypt Data <span class="nav-badge admin">Admin</span>
-                </a>
-                <a href="{{ url_for('decrypt') }}" class="nav-item {% if request.endpoint == 'decrypt' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
-                    Decrypt Data <span class="nav-badge admin">Admin</span>
-                </a>
-                <a href="{{ url_for('verify_audit') }}" class="nav-item {% if request.endpoint == 'verify_audit' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    Audit Log <span class="nav-badge admin">Admin</span>
-                </a>
-                <a href="{{ url_for('tamper_test') }}" class="nav-item {% if request.endpoint == 'tamper_test' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                    Tamper Test <span class="nav-badge admin">Admin</span>
-                </a>
-                <a href="{{ url_for('status') }}" class="nav-item {% if request.endpoint == 'status' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                    System Status <span class="nav-badge admin">Admin</span>
-                </a>
-                {% endif %}
+                <div class="nav-group-label" onclick="toggleNavGroup(this)">Security</div>
+                <div class="nav-items-container">
+                    <a href="{{ url_for('encrypt_image') }}" class="nav-item {% if request.endpoint == 'encrypt_image' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        Image Encryption
+                    </a>
+                    <a href="{{ url_for('decrypt_image') }}" class="nav-item {% if request.endpoint == 'decrypt_image' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+                        Image Decryption
+                    </a>
+                    <a href="{{ url_for('send_email') }}" class="nav-item {% if request.endpoint == 'send_email' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        Send Secure Email
+                    </a>
+                    <a href="{{ url_for('receive_email') }}" class="nav-item {% if request.endpoint == 'receive_email' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+                        Receive Payload
+                    </a>
+                    {% if session.get('role') == 'admin' %}
+                    <a href="{{ url_for('encrypt') }}" class="nav-item {% if request.endpoint == 'encrypt' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        Encrypt Data <span class="nav-badge admin">Admin</span>
+                    </a>
+                    <a href="{{ url_for('decrypt') }}" class="nav-item {% if request.endpoint == 'decrypt' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+                        Decrypt Data <span class="nav-badge admin">Admin</span>
+                    </a>
+                    <a href="{{ url_for('verify_audit') }}" class="nav-item {% if request.endpoint == 'verify_audit' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Audit Log <span class="nav-badge admin">Admin</span>
+                    </a>
+                    <a href="{{ url_for('tamper_test') }}" class="nav-item {% if request.endpoint == 'tamper_test' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        Tamper Test <span class="nav-badge admin">Admin</span>
+                    </a>
+                    <a href="{{ url_for('status') }}" class="nav-item {% if request.endpoint == 'status' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                        System Status <span class="nav-badge admin">Admin</span>
+                    </a>
+                    {% endif %}
+                </div>
             </div>
 
             <div class="nav-group">
-                <div class="nav-group-label">Account</div>
-                <a href="{{ url_for('profile') }}" class="nav-item {% if request.endpoint == 'profile' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    Profile
-                </a>
-                <a href="{{ url_for('settings') }}" class="nav-item {% if request.endpoint == 'settings' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                    Settings
-                </a>
-                <a href="{{ url_for('security') }}" class="nav-item {% if request.endpoint == 'security' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    Security
-                </a>
-                <a href="{{ url_for('help_page') }}" class="nav-item {% if request.endpoint == 'help_page' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                    Help
-                </a>
+                <div class="nav-group-label" onclick="toggleNavGroup(this)">Account</div>
+                <div class="nav-items-container">
+                    <a href="{{ url_for('profile') }}" class="nav-item {% if request.endpoint == 'profile' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Profile
+                    </a>
+                    <a href="{{ url_for('settings') }}" class="nav-item {% if request.endpoint == 'settings' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        Settings
+                    </a>
+                    <a href="{{ url_for('security') }}" class="nav-item {% if request.endpoint == 'security' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Security
+                    </a>
+                    <a href="{{ url_for('help_page') }}" class="nav-item {% if request.endpoint == 'help_page' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        Help
+                    </a>
+                </div>
             </div>
 
             <div class="sidebar-footer">
@@ -661,6 +702,38 @@
             </div>
         </main>
     </div>
+
+    <script>
+        function toggleNavGroup(label) {
+            const group = label.parentElement;
+            group.classList.toggle('collapsed');
+            
+            // Optional: Store state in localStorage
+            const groupName = label.textContent.trim();
+            localStorage.setItem(`sidebar_group_${groupName}`, group.classList.contains('collapsed'));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const groups = document.querySelectorAll('.nav-group');
+            groups.forEach(group => {
+                const label = group.querySelector('.nav-group-label');
+                const groupName = label.textContent.trim();
+                
+                // Check if this group contains an active link
+                const hasActive = group.querySelector('.nav-item.active');
+                
+                // Retrieve saved state
+                const isCollapsed = localStorage.getItem(`sidebar_group_${groupName}`);
+                
+                if (hasActive) {
+                    // Always expand group with active item
+                    group.classList.remove('collapsed');
+                } else if (isCollapsed === 'true') {
+                    group.classList.add('collapsed');
+                }
+            });
+        });
+    </script>
 
     {% block scripts %}{% endblock %}
 </body>
